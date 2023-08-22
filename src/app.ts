@@ -5,7 +5,7 @@ import cors from "cors";
 import http from "http";
 import "reflect-metadata";
 import "dotenv/config";
-import dataSource from "./data-source";
+import { initDatabase } from "./data-source";
 
 const app = express();
 
@@ -19,13 +19,5 @@ const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
   console.log("Server running on port:", PORT);
+  initDatabase();
 });
-
-dataSource
-  .initialize()
-  .then(() => {
-    console.log("Data Source has been initialized!");
-  })
-  .catch((err) => {
-    console.error("Error during Data Source initialization", err);
-  });
