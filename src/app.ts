@@ -5,7 +5,6 @@ import cors from "cors";
 import http from "http";
 import "reflect-metadata";
 import "dotenv/config";
-
 import dataSource from "./data-source";
 
 const app = express();
