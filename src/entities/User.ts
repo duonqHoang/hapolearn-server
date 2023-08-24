@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { Course } from "./Course";
 import { Review } from "./Review";
-import { IsEmail, IsISO8601, MinLength } from "class-validator";
+import { IsEmail, IsISO8601 } from "class-validator";
 
 @Entity()
 export class User {

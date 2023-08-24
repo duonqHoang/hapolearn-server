@@ -5,12 +5,13 @@ const userRepo = AppDataSource.getRepository(User);
 
 const findUserByEmail = (email: string) => userRepo.findOneBy({ email });
 
-const saveUser = (name: string, email: string, password: string) => {
-  const user = new User();
-  user.name = name;
-  user.email = email;
-  user.password = password;
+const registerUser = (name: string, email: string, password: string) => {
+  const user = userRepo.create({
+    name,
+    email,
+    password,
+  });
   return userRepo.save(user);
 };
 
-export { findUserByEmail, saveUser };
+export { findUserByEmail, registerUser };
