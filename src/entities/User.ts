@@ -8,7 +8,6 @@ import {
 } from "typeorm";
 import { Course } from "./Course";
 import { Review } from "./Review";
-import { IsEmail, IsISO8601 } from "class-validator";
 
 @Entity()
 export class User {
@@ -19,7 +18,6 @@ export class User {
   name: string;
 
   @Column()
-  @IsEmail()
   email: string;
 
   @Column()
@@ -35,7 +33,6 @@ export class User {
   address: string;
 
   @Column({ type: "date", nullable: true })
-  @IsISO8601()
   dob: string;
 
   @Column({ nullable: true })
