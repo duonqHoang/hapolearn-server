@@ -15,31 +15,30 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
-  @Column({ nullable: false })
+  @Column()
   @IsEmail()
   email: string;
 
-  @Column({ nullable: false })
-  @MinLength(8)
+  @Column()
   password: string;
 
-  @Column({ type: "text" })
+  @Column({ type: "text", nullable: true })
   bio: string;
 
-  @Column()
+  @Column({ nullable: true })
   phone: string;
 
-  @Column()
+  @Column({ nullable: true })
   address: string;
 
-  @Column({ type: "date" })
+  @Column({ type: "date", nullable: true })
   @IsISO8601()
   dob: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatar: string;
 
   @ManyToMany(() => Course, (course) => course.learners, { cascade: true })
