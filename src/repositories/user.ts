@@ -3,15 +3,22 @@ import { User } from "../entities/User";
 
 const userRepo = AppDataSource.getRepository(User);
 
-const findUserByEmail = (email: string) => userRepo.findOneBy({ email });
+const findUserByID = (id: number) => userRepo.findOneBy({ id });
 
-const registerUser = (name: string, email: string, password: string) => {
+const findUserByUsername = (username: string) =>
+  userRepo.findOneBy({ username });
+
+const findExistedUser = (username: string, email: string) => {
+  return userRepo.findOneBy([{ username }, { email }]);
+};
+
+const registerUser = (username: string, email: string, password: string) => {
   const user = userRepo.create({
-    name,
+    username,
     email,
     password,
   });
   return userRepo.save(user);
 };
 
-export { findUserByEmail, registerUser };
+export { findUserByID, findUserByUsername, findExistedUser, registerUser };

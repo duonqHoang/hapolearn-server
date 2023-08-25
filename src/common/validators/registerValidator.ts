@@ -1,8 +1,9 @@
 import { IsEmail, MinLength, NotContains, validate } from "class-validator";
 
 class registerForm {
-  @MinLength(2)
-  name: string;
+  @MinLength(8)
+  @NotContains(" ")
+  username: string;
 
   @IsEmail()
   email: string;
@@ -13,12 +14,12 @@ class registerForm {
 }
 
 export const validateRegister = (
-  name: string,
+  username: string,
   email: string,
   password: string
 ) => {
   const input = new registerForm();
-  input.name = name;
+  input.username = username;
   input.email = email;
   input.password = password.trim();
 

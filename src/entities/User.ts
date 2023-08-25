@@ -5,16 +5,21 @@ import {
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
 } from "typeorm";
 import { Course } from "./Course";
 import { Review } from "./Review";
 
 @Entity()
+@Unique(["username"])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
+  username: string;
+
+  @Column({ nullable: true })
   name: string;
 
   @Column()
