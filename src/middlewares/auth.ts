@@ -10,7 +10,9 @@ const isAuthenticated: RequestHandler = (req, res, next) => {
     const decodedToken = <UserJWTPayload>(
       jwt.verify(req.cookies.jwt, process.env.JWT_SECRET)
     );
-    req.body.userID = decodedToken.userID;
+    const userID = decodedToken.userID;
+    if (!userID) throw new Error("User not found");
+    req.body.userID = userID;
     next();
   } catch (err) {
     res.status(400).send(err.message);
