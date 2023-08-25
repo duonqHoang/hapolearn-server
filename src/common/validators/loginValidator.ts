@@ -2,10 +2,11 @@ import { MinLength, NotContains, validate } from "class-validator";
 
 class loginForm {
   @MinLength(8)
+  @NotContains(" ", { message: "Username must contains no space" })
   username: string;
 
   @MinLength(8)
-  @NotContains(" ")
+  @NotContains(" ", { message: "Password must contains no space" })
   password: string;
 }
 

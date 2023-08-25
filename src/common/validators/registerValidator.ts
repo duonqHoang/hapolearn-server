@@ -2,14 +2,14 @@ import { IsEmail, MinLength, NotContains, validate } from "class-validator";
 
 class registerForm {
   @MinLength(8)
-  @NotContains(" ")
+  @NotContains(" ", { message: "Username must contains no space" })
   username: string;
 
   @IsEmail()
   email: string;
 
   @MinLength(8)
-  @NotContains(" ")
+  @NotContains(" ", { message: "Password must contains no space" })
   password: string;
 }
 
