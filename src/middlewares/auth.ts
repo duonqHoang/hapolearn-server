@@ -10,9 +10,10 @@ const isAuthenticated: RequestHandler = (req, res, next) => {
     const decodedToken = <UserJWTPayload>(
       jwt.verify(req.cookies.jwt, process.env.JWT_SECRET)
     );
-
-    req.body.userID = decodedToken.userID;
-    next();
+    if (decodedToken) {
+      req.body.userID = decodedToken.userID;
+      next();
+    } else throw new Error("Invalid JWT token");
   } catch (err) {
     res.status(400).send(err.message);
   }
