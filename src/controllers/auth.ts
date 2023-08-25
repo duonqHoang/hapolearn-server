@@ -11,4 +11,15 @@ const register: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { register };
+const login: RequestHandler = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const token = await authService.login(email, password.trim());
+
+    res.cookie("jwt", token, { httpOnly: true }).send("Logged in");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export { register, login };
