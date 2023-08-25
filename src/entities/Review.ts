@@ -7,7 +7,6 @@ import {
 } from "typeorm";
 import { User } from "./User";
 import { Course } from "./Course";
-import { Min, Max } from "class-validator";
 
 @Unique(["user", "course"])
 @Entity()
@@ -16,8 +15,6 @@ export class Review {
   id: number;
 
   @Column({ nullable: false })
-  @Min(1)
-  @Max(5)
   star: number;
 
   @Column({ type: "text" })
