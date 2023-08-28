@@ -1,16 +1,20 @@
 import bcript from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findUserByEmail, registerUser } from "../repositories/user";
+import {
+  findExistedUser,
+  findUserByUsername,
+  registerUser,
+} from "../repositories/user";
 
-const register = async (name: string, email: string, password: string) => {
-  const existedUser = await findUserByEmail(email);
+const register = async (username: string, email: string, password: string) => {
+  const existedUser = await findExistedUser(username, email);
   if (existedUser) {
-    console.log("Email is already used!");
-    throw new Error("Email is already used!");
+    console.log("Username or Email is already used!");
+    throw new Error("Username or Email is already used!");
   }
 
   const hashed = await bcript.hash(password, +process.env.BC_SALT_ROUNDS);
-  const newUser = await registerUser(name, email, hashed);
+  const newUser = await registerUser(username, email, hashed);
   if (newUser) {
     console.log("Registered new user!");
     return newUser;
@@ -21,9 +25,9 @@ const register = async (name: string, email: string, password: string) => {
 };
 
 const login = async (email: string, password: string) => {
-  const user = await findUserByEmail(email);
+  const user = await findUserByUsername(email);
   if (!user) {
-    const message: string = "A user with this email could not be found!";
+    const message: string = "A user with this username could not be found!";
     console.log(message);
     throw new Error(message);
   }
@@ -35,13 +39,9 @@ const login = async (email: string, password: string) => {
     throw new Error(message);
   }
 
-  const token = jwt.sign(
-    { userID: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRE,
-    }
-  );
+  const token = jwt.sign({ userID: user.id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
 
   return token;
 };

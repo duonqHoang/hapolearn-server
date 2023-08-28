@@ -3,8 +3,8 @@ import { validateLogin } from "../common/validators/loginValidator";
 import { validateRegister } from "../common/validators/registerValidator";
 
 const registerVal: RequestHandler = (req, res, next) => {
-  const { name, email, password } = req.body;
-  validateRegister(name, email, password).then((errors) => {
+  const { username, email, password } = req.body;
+  validateRegister(username, email, password).then((errors) => {
     if (errors.length > 0) {
       return res.status(400).json({ errors });
     } else next();
@@ -12,8 +12,8 @@ const registerVal: RequestHandler = (req, res, next) => {
 };
 
 const loginVal: RequestHandler = (req, res, next) => {
-  const { email, password } = req.body;
-  validateLogin(email, password).then((errors) => {
+  const { username, password } = req.body;
+  validateLogin(username, password).then((errors) => {
     if (errors.length > 0) {
       return res.status(400).json({ errors });
     } else next();
