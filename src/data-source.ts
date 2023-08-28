@@ -7,6 +7,8 @@ const AppDataSource = new DataSource({
   username: process.env.MYSQL_USERNAME,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
+  entities: [__dirname + "/entities/*.{js,ts}"],
+  synchronize: true,
 });
 
 const initDatabase: Function = () => {
