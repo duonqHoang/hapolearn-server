@@ -27,7 +27,7 @@ const register = async (username: string, email: string, password: string) => {
 const login = async (email: string, password: string) => {
   const user = await findUserByUsername(email);
   if (!user) {
-    const message: string = "A user with this email could not be found!";
+    const message: string = "A user with this username could not be found!";
     console.log(message);
     throw new Error(message);
   }
@@ -39,13 +39,9 @@ const login = async (email: string, password: string) => {
     throw new Error(message);
   }
 
-  const token = jwt.sign(
-    { userID: user.id, email: user.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRE,
-    }
-  );
+  const token = jwt.sign({ userID: user.id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
 
   return token;
 };
