@@ -19,7 +19,7 @@ export class Teacher {
   bio: string;
 
   @Column({ type: "json", nullable: true })
-  links: { google: ""; facebook: ""; slack: "" };
+  links: { google: string; facebook: string; slack: string };
 
   @OneToMany(() => Course, (course) => course.teacher)
   courses: Course[];
