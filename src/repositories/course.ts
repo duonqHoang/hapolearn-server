@@ -4,7 +4,11 @@ import { findTeacherByID } from "./teacher";
 
 const courseRepo = AppDataSource.getRepository(Course);
 
-const findCourseByID = (id: number) => courseRepo.findOneBy({ id });
+const findCourseByID = (id: number) =>
+  courseRepo.findOne({
+    relations: { teacher: true, reviews: true, learners: true, lessons: true },
+    where: { id },
+  });
 
 const addCourse = async (
   name: string,
