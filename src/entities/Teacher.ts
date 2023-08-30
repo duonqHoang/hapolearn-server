@@ -6,19 +6,19 @@ export class Teacher {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatar: string;
 
   @Column()
   role: string;
 
-  @Column({ type: "text" })
+  @Column({ type: "text", nullable: true })
   bio: string;
 
-  @Column({ type: "json" })
+  @Column({ type: "json", nullable: true })
   links: { google: ""; facebook: ""; slack: "" };
 
   @OneToMany(() => Course, (course) => course.teacher)

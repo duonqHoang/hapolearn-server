@@ -16,27 +16,27 @@ export class Course {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
-  @Column({ type: "text", nullable: false })
+  @Column({ type: "text" })
   description: string;
 
   @Column({ type: "double" })
   price: number;
 
-  @Column()
+  @Column({ nullable: true })
   image: string;
 
   @ManyToMany(() => User, (user) => user.courses)
   learners: User[];
 
-  @OneToMany(() => Review, (review) => review.course)
+  @OneToMany(() => Review, (review) => review.course, { cascade: true })
   reviews: Review[];
 
-  @OneToMany(() => Lesson, (lesson) => lesson.course)
+  @OneToMany(() => Lesson, (lesson) => lesson.course, { cascade: true })
   lessons: Lesson[];
 
-  @ManyToOne(() => Teacher, (teacher) => teacher.courses)
+  @ManyToOne(() => Teacher, (teacher) => teacher.courses, { cascade: true })
   teacher: Teacher;
 }
