@@ -13,7 +13,7 @@ export class Lesson {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
   @Column({ type: "text" })
