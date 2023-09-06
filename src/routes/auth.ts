@@ -8,5 +8,7 @@ export default (router: express.Router) => {
 
   router.post("/login", loginVal, authController.login);
 
+  router.get("/login", isAuthenticated);
+
   router.post("/logout", isAuthenticated, authController.logout);
 };

@@ -14,6 +14,9 @@ const isAuthenticated: RequestHandler = async (req, res, next) => {
     const userID = decodedToken.userID;
     const user = await findUserByID(userID);
     if (user) {
+      if (req.url === "/login") {
+        res.send("Already logged in");
+      }
       req.body.userID = userID;
       next();
     } else throw new Error("User not found");
