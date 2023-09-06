@@ -26,4 +26,12 @@ const login: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { register, login };
+const logout: RequestHandler = async (req, res, next) => {
+  try {
+    res.clearCookie("jwt").status(200).send("Logged out");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export { register, login, logout };
