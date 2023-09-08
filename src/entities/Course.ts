@@ -1,10 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
 import { Review } from "./Review";
@@ -39,4 +41,10 @@ export class Course {
 
   @ManyToOne(() => Teacher, (teacher) => teacher.courses, { cascade: true })
   teacher: Teacher;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

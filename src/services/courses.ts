@@ -1,5 +1,6 @@
 import { Course } from "entities/Course";
 import * as courseRepo from "../repositories/course";
+import { ParsedQs } from "qs";
 
 const addCourse = async (
   name: string,
@@ -17,10 +18,11 @@ const addCourse = async (
   return newCourse;
 };
 
-const getCourses = async (pageNumber?: number) => {
+const getCourses = async (queries?: ParsedQs) => {
   let courses: Course[];
-  if (pageNumber) {
-    courses = await courseRepo.getCoursesByPage(pageNumber);
+
+  if (true) {
+    courses = await courseRepo.getCourses(queries);
     if (!courses) throw new Error("Error getting courses");
   } else {
     courses = await courseRepo.getAllCourses();

@@ -20,7 +20,9 @@ const login: RequestHandler = async (req, res, next) => {
     const { username, password } = req.body;
     const token = await authService.login(username, password.trim());
 
-    res.cookie("jwt", token, { httpOnly: true }).send("Logged in");
+    res
+      .cookie("jwt", token, { httpOnly: true, secure: true })
+      .send("Logged in");
   } catch (err) {
     res.status(400).send(err.message);
   }
