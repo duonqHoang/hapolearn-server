@@ -11,18 +11,17 @@ import { Course } from "./Course";
 import { Review } from "./Review";
 
 @Entity()
-@Unique(["username", "email"])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
   @Column({ nullable: true })
   name: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()

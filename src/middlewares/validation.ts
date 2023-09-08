@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { validateLogin } from "../common/validators/loginValidator";
 import { validateRegister } from "../common/validators/registerValidator";
+import { validateUpdateProfile } from "../common/validators/profileValidator";
 
 const registerVal: RequestHandler = (req, res, next) => {
   const { username, email, password } = req.body;
@@ -20,4 +21,15 @@ const loginVal: RequestHandler = (req, res, next) => {
   });
 };
 
-export { registerVal, loginVal };
+const profileUpdateVal: RequestHandler = (req, res, next) => {
+  const { name, email, dob, phone, address, bio } = req.body;
+  validateUpdateProfile(name, email, dob, phone, address, bio).then(
+    (errors) => {
+      if (errors.length > 0) {
+        return res.status(400).json({ errors });
+      } else next();
+    }
+  );
+};
+
+export { registerVal, loginVal, profileUpdateVal };
