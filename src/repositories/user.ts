@@ -21,4 +21,32 @@ const registerUser = (username: string, email: string, password: string) => {
   return userRepo.save(user);
 };
 
-export { findUserByID, findUserByUsername, findExistedUser, registerUser };
+const updateProfile = async (
+  id: number,
+  name: string,
+  email: string,
+  dob: string,
+  phone: string,
+  address: string,
+  bio: string
+) => {
+  const user = await userRepo.findOneBy({ id });
+  if (!user) throw new Error("Error finding user profile");
+  userRepo.merge(user, {
+    name,
+    email,
+    dob,
+    phone,
+    address,
+    bio,
+  });
+  return userRepo.save(user);
+};
+
+export {
+  findUserByID,
+  findUserByUsername,
+  findExistedUser,
+  registerUser,
+  updateProfile,
+};
