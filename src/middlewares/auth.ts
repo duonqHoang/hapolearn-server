@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { findUserByID } from "repositories/user";
+import { findUserByID } from "../repositories/user";
 
 interface UserJWTPayload extends JwtPayload {
   userID: number;

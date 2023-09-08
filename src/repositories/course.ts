@@ -3,6 +3,7 @@ import { AppDataSource } from "../data-source";
 import { findTeacherByID } from "./teacher";
 import { ParsedQs } from "qs";
 import { Lesson } from "../entities/Lesson";
+import { findUserByID } from "./user";
 
 const courseRepo = AppDataSource.getRepository(Course);
 
@@ -74,8 +75,6 @@ const getCourses = (queries: ParsedQs) => {
   }
 
   // if (learners) {
-  //   query.addSelect("COUNT course.lessons", "learnersCount");
-  //   query.orderBy("course.learnersCount", learners === "asc" ? "ASC" : "DESC");
   // }
 
   // if (time) {
@@ -87,4 +86,46 @@ const getCourses = (queries: ParsedQs) => {
   return query.getMany();
 };
 
-export { findCourseByID, addCourse, getAllCourses, getCourses };
+const enrollCourse = async (courseID: number, userID: number) => {
+  const course = await courseRepo.findOne({
+    relations: { learners: true },
+    where: { id: courseID },
+  });
+  if (!course) throw new Error("Error finding course");
+  const user = await findUserByID(userID);
+  if (!user) throw new Error("Error finding user");
+
+  if (
+    course.learners.find((learner) => {
+      return learner.id === user.id;
+    })
+  )
+    throw new Error("Already enrolled course");
+
+  course.learners.push(user);
+
+  return courseRepo.save(course);
+};
+
+const unenrollCourse = async (courseID: number, userID: number) => {
+  const course = await courseRepo.findOne({
+    relations: { learners: true },
+    where: { id: courseID },
+  });
+  if (!course) throw new Error("Error finding course!");
+
+  course.learners = course.learners.filter((learner) => {
+    return learner.id !== userID;
+  });
+
+  return courseRepo.save(course);
+};
+
+export {
+  findCourseByID,
+  addCourse,
+  getAllCourses,
+  getCourses,
+  enrollCourse,
+  unenrollCourse,
+};
