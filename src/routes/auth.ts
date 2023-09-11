@@ -1,9 +1,14 @@
 import express from "express";
-import { login, register } from "../controllers/auth";
+import * as authController from "../controllers/auth";
 import { loginVal, registerVal } from "../middlewares/validation";
+import { isAuthenticated } from "../middlewares/auth";
 
 export default (router: express.Router) => {
-  router.post("/register", registerVal, register);
+  router.post("/register", registerVal, authController.register);
 
-  router.post("/login", loginVal, login);
+  router.post("/login", loginVal, authController.login);
+
+  router.get("/login", isAuthenticated);
+
+  router.post("/logout", isAuthenticated, authController.logout);
 };
