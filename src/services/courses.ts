@@ -1,5 +1,6 @@
 import { Course } from "entities/Course";
 import * as courseRepo from "../repositories/course";
+import { ParsedQs } from "qs";
 
 const addCourse = async (
   name: string,
@@ -17,15 +18,12 @@ const addCourse = async (
   return newCourse;
 };
 
-const getCourses = async (pageNumber?: number) => {
+const getCourses = async (queries?: ParsedQs) => {
   let courses: Course[];
-  if (pageNumber) {
-    courses = await courseRepo.getCoursesByPage(pageNumber);
-    if (!courses) throw new Error("Error getting courses");
-  } else {
-    courses = await courseRepo.getAllCourses();
-    if (!courses) throw new Error("Error getting all courses");
-  }
+
+  courses = await courseRepo.getCourses(queries);
+  if (!courses) throw new Error("Error getting courses");
+
   return courses;
 };
 
@@ -35,4 +33,16 @@ const getCourseByID = async (id: number) => {
   return course;
 };
 
-export { addCourse, getCourses, getCourseByID };
+const enrollCourse = async (courseID: number, userID: number) => {
+  const savedCourse = await courseRepo.enrollCourse(courseID, userID);
+  if (!savedCourse) throw new Error("Error enrolling course");
+  return savedCourse;
+};
+
+const unenrollCourse = async (courseID: number, userID: number) => {
+  const savedCourse = await courseRepo.unenrollCourse(courseID, userID);
+  if (!savedCourse) throw new Error("Error enrolling course");
+  return savedCourse;
+};
+
+export { addCourse, getCourses, getCourseByID, enrollCourse, unenrollCourse };

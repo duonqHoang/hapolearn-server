@@ -18,7 +18,8 @@ const addCourse: RequestHandler = async (req, res, next) => {
 
 const getCourses: RequestHandler = async (req, res, next) => {
   try {
-    const courses = await courseService.getCourses(+req.query.page);
+    const queries = req.query;
+    const courses = await courseService.getCourses(queries);
     if (courses) res.json(courses);
   } catch (err) {
     res.status(400).send(err.message);
@@ -35,4 +36,27 @@ const getCourseByID: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { addCourse, getCourses, getCourseByID };
+const enrollCourse: RequestHandler = async (req, res, next) => {
+  const courseID = req.params.courseID;
+  try {
+    const saved = await courseService.enrollCourse(+courseID, +req.body.userID);
+    if (saved) res.send("Enrolled course successfully!");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+const unenrollCourse: RequestHandler = async (req, res, next) => {
+  const courseID = req.params.courseID;
+  try {
+    const saved = await courseService.unenrollCourse(
+      +courseID,
+      +req.body.userID
+    );
+    if (saved) res.send("Unenrolled course successfully!");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export { addCourse, getCourses, getCourseByID, enrollCourse, unenrollCourse };
