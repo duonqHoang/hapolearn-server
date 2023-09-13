@@ -10,5 +10,7 @@ export default (router: express.Router) => {
 
   router.get("/login", isAuthenticated);
 
+  router.get("/refresh", authController.handleRefreshToken);
+
   router.post("/logout", isAuthenticated, authController.logout);
 };

@@ -9,7 +9,7 @@ interface UserJWTPayload extends JwtPayload {
 const isAuthenticated: RequestHandler = async (req, res, next) => {
   try {
     const decodedToken = <UserJWTPayload>(
-      jwt.verify(req.cookies.jwt, process.env.JWT_SECRET)
+      jwt.verify(req.cookies.accessToken, process.env.ACCESS_TOKEN_SECRET)
     );
     const userID = decodedToken.userID;
     const user = await findUserByID(userID);
