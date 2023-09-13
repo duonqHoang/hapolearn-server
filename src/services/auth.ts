@@ -88,8 +88,6 @@ const login = async (
     newRefreshToken,
   ]);
 
-  console.log(savedUser.refreshTokens);
-
   return { accessToken, newRefreshToken, shouldClearToken };
 };
 
