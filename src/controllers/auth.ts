@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import jwt from "jsonwebtoken";
 import * as authService from "../services/auth";
 
 const register: RequestHandler = async (req, res, next) => {
@@ -41,6 +42,19 @@ const login: RequestHandler = async (req, res, next) => {
   }
 };
 
+const getLoginStatus: RequestHandler = async (req, res) => {
+  try {
+    const { accessToken, refreshToken } = req.cookies;
+    const isLoggedIn = await authService.getLoginStatus(
+      accessToken,
+      refreshToken
+    );
+    if (isLoggedIn) res.status(200).send("Logged in");
+  } catch (err) {
+    res.status(401).send(err.message);
+  }
+};
+
 const handleRefreshToken: RequestHandler = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
@@ -74,4 +88,4 @@ const logout: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { register, login, logout, handleRefreshToken };
+export { register, login, getLoginStatus, logout, handleRefreshToken };

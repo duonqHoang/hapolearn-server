@@ -8,7 +8,7 @@ export default (router: express.Router) => {
 
   router.post("/login", loginVal, authController.login);
 
-  router.get("/login", isAuthenticated);
+  router.get("/login", authController.getLoginStatus);
 
   router.get("/refresh", authController.handleRefreshToken);
 

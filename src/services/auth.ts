@@ -93,6 +93,27 @@ const login = async (
   return { accessToken, newRefreshToken, shouldClearToken };
 };
 
+const getLoginStatus = async (accessToken: string, refreshToken: string) => {
+  try {
+    const decodedAccess: any = jwt.verify(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+    const decodedRefresh: any = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+    if (decodedAccess && decodedRefresh) return true;
+  } catch (err) {
+    const user = await findUserByRefreshToken(refreshToken);
+    await saveRefreshToken(
+      user,
+      user.refreshTokens.filter((rt) => rt !== refreshToken)
+    );
+    throw new Error("Invalid or expired tokens");
+  }
+};
+
 const handleRefreshToken = async (refreshToken: string) => {
   let decoded: any;
 
@@ -153,4 +174,4 @@ const logout = async (refreshToken: string) => {
   );
 };
 
-export { register, login, handleRefreshToken, logout };
+export { register, login, getLoginStatus, handleRefreshToken, logout };
