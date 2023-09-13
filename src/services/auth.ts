@@ -64,6 +64,25 @@ const login = async (
     ? user.refreshTokens
     : user.refreshTokens.filter((token) => token !== refreshToken);
 
+  let shouldClearToken = false;
+
+  if (refreshToken) {
+    /* 
+      Scenarios: 
+          1) User logs in but never uses RT and does not logout
+          2) RT is stolen
+          3) If 1 & 2, reuse detection is needed to clear all RTs when user logs in
+    */
+    const foundToken = user.refreshTokens.includes(refreshToken);
+
+    if (!foundToken) {
+      console.log("Refresh token reuse at login!");
+      newRefreshTokenArr = [];
+    }
+
+    shouldClearToken = true;
+  }
+
   const savedUser = await saveRefreshToken(user, [
     ...newRefreshTokenArr,
     newRefreshToken,
@@ -71,7 +90,7 @@ const login = async (
 
   console.log(savedUser.refreshTokens);
 
-  return { accessToken, newRefreshToken };
+  return { accessToken, newRefreshToken, shouldClearToken };
 };
 
 const handleRefreshToken = async (refreshToken: string) => {

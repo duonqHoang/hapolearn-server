@@ -20,11 +20,12 @@ const login: RequestHandler = async (req, res, next) => {
     const { username, password } = req.body;
     const refreshToken = req.cookies.refreshToken;
 
-    const { accessToken, newRefreshToken } = await authService.login(
-      username,
-      password.trim(),
-      refreshToken
-    );
+    const { accessToken, newRefreshToken, shouldClearToken } =
+      await authService.login(username, password.trim(), refreshToken);
+
+    if (shouldClearToken) {
+      res.clearCookie("refreshToken");
+    }
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
