@@ -21,7 +21,7 @@ const isAuthenticated: RequestHandler = async (req, res, next) => {
       next();
     } else throw new Error("User not found");
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(401).send(err.message);
   }
 };
 
