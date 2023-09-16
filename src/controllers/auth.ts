@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import jwt from "jsonwebtoken";
 import * as authService from "../services/auth";
 
 const register: RequestHandler = async (req, res, next) => {
@@ -18,9 +19,59 @@ const register: RequestHandler = async (req, res, next) => {
 const login: RequestHandler = async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    const token = await authService.login(username, password.trim());
+    const refreshToken = req.cookies.refreshToken;
 
-    res.cookie("jwt", token, { httpOnly: true }).send("Logged in");
+    const { accessToken, newRefreshToken, shouldClearToken } =
+      await authService.login(username, password.trim(), refreshToken);
+
+    if (shouldClearToken) {
+      res.clearCookie("refreshToken");
+    }
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60,
+    });
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+    res.send("Logged in");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+const getLoginStatus: RequestHandler = async (req, res) => {
+  try {
+    const { accessToken, refreshToken } = req.cookies;
+    const isLoggedIn = await authService.getLoginStatus(
+      accessToken,
+      refreshToken
+    );
+    if (isLoggedIn) res.status(200).send("Logged in");
+  } catch (err) {
+    res.status(401).send(err.message);
+  }
+};
+
+const handleRefreshToken: RequestHandler = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) throw new Error("No refresh token provided");
+
+    const { accessToken, newRefreshToken } =
+      await authService.handleRefreshToken(refreshToken);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60,
+    });
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+    res.send("Refreshed tokens");
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -28,10 +79,13 @@ const login: RequestHandler = async (req, res, next) => {
 
 const logout: RequestHandler = async (req, res, next) => {
   try {
-    res.clearCookie("jwt").status(200).send("Logged out");
+    await authService.logout(req.cookies.refreshToken);
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).send("Logged out");
   } catch (err) {
     res.status(400).send(err.message);
   }
 };
 
-export { register, login, logout };
+export { register, login, getLoginStatus, logout, handleRefreshToken };
