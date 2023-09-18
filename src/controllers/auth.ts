@@ -1,5 +1,4 @@
 import { RequestHandler } from "express";
-import jwt from "jsonwebtoken";
 import * as authService from "../services/auth";
 
 const register: RequestHandler = async (req, res, next) => {

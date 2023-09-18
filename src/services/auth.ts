@@ -61,7 +61,7 @@ const login = async (
   );
 
   let newRefreshTokenArr = !refreshToken
-    ? user.refreshTokens
+    ? user.refreshTokens || []
     : user.refreshTokens.filter((token) => token !== refreshToken);
 
   let shouldClearToken = false;
