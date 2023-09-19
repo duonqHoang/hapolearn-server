@@ -3,6 +3,7 @@ import {
   IsISO8601,
   IsOptional,
   IsPhoneNumber,
+  ValidateIf,
   validate,
 } from "class-validator";
 
@@ -10,16 +11,16 @@ class ProfileForm {
   @IsOptional()
   name: string;
 
-  @IsOptional()
   @IsEmail()
   email: string;
 
-  @IsOptional()
   @IsISO8601()
+  @IsOptional()
   dob: string;
 
-  @IsOptional()
+  @ValidateIf((form) => form.phone !== "")
   @IsPhoneNumber()
+  @IsOptional()
   phone: string;
 
   @IsOptional()
