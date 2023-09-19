@@ -3,7 +3,8 @@ import { User } from "../entities/User";
 
 const userRepo = AppDataSource.getRepository(User);
 
-const findUserByID = (id: number) => userRepo.findOneBy({ id });
+const findUserByID = (id: number) =>
+  userRepo.findOne({ relations: { courses: true }, where: { id } });
 
 const findUserByUsername = (username: string) =>
   userRepo.findOneBy({ username });

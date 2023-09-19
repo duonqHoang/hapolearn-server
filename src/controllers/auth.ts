@@ -50,7 +50,7 @@ const getLoginStatus: RequestHandler = async (req, res) => {
     );
     if (isLoggedIn) res.status(200).send("Logged in");
   } catch (err) {
-    res.status(401).send(err.message);
+    res.status(403).send(err.message);
   }
 };
 
