@@ -19,7 +19,7 @@ class ProfileForm {
   dob: string;
 
   @ValidateIf((form) => form.phone !== "")
-  @IsPhoneNumber()
+  @IsPhoneNumber("VN")
   @IsOptional()
   phone: string;
 

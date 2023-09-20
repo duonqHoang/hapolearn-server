@@ -87,4 +87,44 @@ const logout: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { register, login, getLoginStatus, logout, handleRefreshToken };
+const forgetPassword: RequestHandler = async (req, res, next) => {
+  try {
+    const sent =  authService.forgetPassword(req.body.email);
+    if (sent) res.status(200).send("Sent email!");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+const getResetPassword: RequestHandler = async (req, res, next) => {
+  try {
+    const { username, token } = req.params;
+    const data = await authService.getResetPassword(username, token);
+    res.send(data);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+const resetPassword: RequestHandler = async (req, res, next) => {
+  try {
+    const { username, password, token } = req.body;
+    const saved = await authService.resetPassword(username, password, token);
+    if (!saved) throw new Error("Error changing password");
+    res.send("Successfully changed your password!");
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("Error changing password");
+  }
+};
+
+export {
+  register,
+  login,
+  getLoginStatus,
+  logout,
+  handleRefreshToken,
+  forgetPassword,
+  getResetPassword,
+  resetPassword,
+};
