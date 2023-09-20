@@ -89,7 +89,7 @@ const logout: RequestHandler = async (req, res, next) => {
 
 const forgetPassword: RequestHandler = async (req, res, next) => {
   try {
-    const sent =  authService.forgetPassword(req.body.email);
+    const sent = await authService.forgetPassword(req.body.email);
     if (sent) res.status(200).send("Sent email!");
   } catch (err) {
     res.status(400).send(err.message);
