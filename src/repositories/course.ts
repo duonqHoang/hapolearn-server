@@ -4,14 +4,52 @@ import { findTeacherByID } from "./teacher";
 import { ParsedQs } from "qs";
 import { Lesson } from "../entities/Lesson";
 import { findUserByID } from "./user";
+import { Review } from "../entities/Review";
 
 const courseRepo = AppDataSource.getRepository(Course);
 
-const findCourseByID = (id: number) =>
-  courseRepo.findOne({
-    relations: { teacher: true, reviews: true, learners: true, lessons: true },
-    where: { id },
-  });
+const findCourseByID = (id: number) => courseRepo.findOneBy({ id });
+
+const getCourseByID = async (id: number) => {
+  const query = courseRepo
+    .createQueryBuilder("course")
+    .where("course.id = :courseID", { courseID: id })
+    .leftJoin("course.lessons", "lesson")
+    .leftJoin("course.teacher", "teacher")
+    .leftJoin("course.reviews", "review")
+    .leftJoin("review.user", "user");
+
+  query.addSelect([
+    "course.*",
+    "lesson",
+    "teacher",
+    "review",
+    "user.id",
+    "user.name",
+    "user.avatar",
+  ]);
+
+  // select average rating in raw data
+  query.addSelect((sb) => {
+    return sb
+      .select("SUM(review.star) / COUNT(review.id)", "averageRating")
+      .groupBy("review.courseId")
+      .from(Review, "review")
+      .where("review.courseId = course.id");
+  }, "averageRating");
+
+  // get learners and reviews counts
+  query.loadRelationCountAndMap("course.reviewsCount", "course.reviews");
+  query.loadRelationCountAndMap("course.learnersCount", "course.learners");
+
+  // put average rating in entity
+  const raw_and_entities = await query.getRawAndEntities();
+
+  raw_and_entities.entities[0].averageRating =
+    raw_and_entities.raw[0].averageRating;
+
+  return raw_and_entities.entities[0];
+};
 
 const addCourse = async (
   name: string,
@@ -44,12 +82,13 @@ const getCourses = (queries: ParsedQs) => {
     queries;
 
   const coursesPerPage: number = 14;
-  const query = courseRepo
-    .createQueryBuilder("course")
-    .leftJoinAndSelect("course.lessons", "lesson")
-    .leftJoinAndSelect("course.learners", "user")
-    .leftJoinAndSelect("course.teacher", "teacher");
+  const query = courseRepo.createQueryBuilder("course");
 
+  // load lessons and learners counts
+  query.loadRelationCountAndMap("course.lessonsCount", "course.lessons");
+  query.loadRelationCountAndMap("course.learnersCount", "course.learners");
+
+  // filters
   if (s) {
     query.andWhere("course.name LIKE :search", { search: `%${s}%` });
   }
@@ -58,7 +97,7 @@ const getCourses = (queries: ParsedQs) => {
     query.andWhere("course.teacherId = :teacher", { teacher: +teacher });
   }
 
-  // Order added earlier takes precedence
+  // orders: order added earlier takes precedence
 
   if (date) {
     query.addOrderBy("course.createdAt", date === "asc" ? "ASC" : "DESC");
@@ -81,6 +120,7 @@ const getCourses = (queries: ParsedQs) => {
   //   query.orderBy("course.time", time === "asc" ? "ASC" : "DESC");
   // }
 
+  // pagination
   query.skip(coursesPerPage * (page ? +page - 1 : 0)).take(coursesPerPage);
 
   return query.getMany();
@@ -123,6 +163,7 @@ const unenrollCourse = async (courseID: number, userID: number) => {
 
 export {
   findCourseByID,
+  getCourseByID,
   addCourse,
   getAllCourses,
   getCourses,

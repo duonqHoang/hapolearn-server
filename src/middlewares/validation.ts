@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { validateLogin } from "../common/validators/loginValidator";
 import { validateRegister } from "../common/validators/registerValidator";
 import { validateUpdateProfile } from "../common/validators/profileValidator";
+import { validateReview } from "../common/validators/reviewValidator";
 import {
   validateForget,
   validateReset,
@@ -48,9 +49,23 @@ const profileUpdateVal: RequestHandler = (req, res, next) => {
   );
 };
 
+const reviewVal: RequestHandler = (req, res, next) => {
+  const {star, comment} = req.body;
+  validateReview(+star, comment).then((errors) => {
+    if (errors.length > 0) {
+      return res.status(400).send(
+        errors.map((err) => {
+          return Object.values(err.constraints);
+        })
+      );
+    } else next();
+  });
+};
+
 const forgetPassVal: RequestHandler = (req, res, next) => {
   const { email } = req.body;
   validateForget(email).then((errors) => {
+
     if (errors.length > 0) {
       return res.status(400).send(
         errors.map((err) => {
@@ -74,4 +89,4 @@ const resetPassVal: RequestHandler = (req, res, next) => {
   });
 };
 
-export { registerVal, loginVal, profileUpdateVal, forgetPassVal, resetPassVal };
+export { registerVal, loginVal, profileUpdateVal,reviewVal, forgetPassVal, resetPassVal };
