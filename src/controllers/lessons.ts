@@ -19,4 +19,14 @@ const createLesson: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { createLesson };
+const getLessons: RequestHandler = async (req, res, next) => {
+  try {
+    const { courseID } = req.params;
+    const data = await lessonServices.getLessons(+courseID);
+    res.send(data);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export { createLesson, getLessons };
