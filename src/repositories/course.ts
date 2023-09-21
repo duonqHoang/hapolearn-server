@@ -4,7 +4,6 @@ import { findTeacherByID } from "./teacher";
 import { ParsedQs } from "qs";
 import { Lesson } from "../entities/Lesson";
 import { findUserByID } from "./user";
-import { Review } from "../entities/Review";
 
 const courseRepo = AppDataSource.getRepository(Course);
 
@@ -14,41 +13,15 @@ const getCourseByID = async (id: number) => {
   const query = courseRepo
     .createQueryBuilder("course")
     .where("course.id = :courseID", { courseID: id })
-    .leftJoin("course.lessons", "lesson")
-    .leftJoin("course.teacher", "teacher")
-    .leftJoin("course.reviews", "review")
-    .leftJoin("review.user", "user");
+    .leftJoin("course.teacher", "teacher");
 
-  query.addSelect([
-    "course.*",
-    "lesson",
-    "teacher",
-    "review",
-    "user.id",
-    "user.name",
-    "user.avatar",
-  ]);
+  query.addSelect(["course.*", "teacher"]);
 
-  // select average rating in raw data
-  query.addSelect((sb) => {
-    return sb
-      .select("SUM(review.star) / COUNT(review.id)", "averageRating")
-      .groupBy("review.courseId")
-      .from(Review, "review")
-      .where("review.courseId = course.id");
-  }, "averageRating");
-
-  // get learners and reviews counts
-  query.loadRelationCountAndMap("course.reviewsCount", "course.reviews");
+  // get learners and lessons counts
+  query.loadRelationCountAndMap("course.lessonsCount", "course.lessons");
   query.loadRelationCountAndMap("course.learnersCount", "course.learners");
 
-  // put average rating in entity
-  const raw_and_entities = await query.getRawAndEntities();
-
-  raw_and_entities.entities[0].averageRating =
-    raw_and_entities.raw[0].averageRating;
-
-  return raw_and_entities.entities[0];
+  return query.getOne();
 };
 
 const addCourse = async (
@@ -123,7 +96,7 @@ const getCourses = (queries: ParsedQs) => {
   // pagination
   query.skip(coursesPerPage * (page ? +page - 1 : 0)).take(coursesPerPage);
 
-  return query.getMany();
+  return query.getManyAndCount();
 };
 
 const enrollCourse = async (courseID: number, userID: number) => {

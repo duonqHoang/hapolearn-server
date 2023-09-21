@@ -19,8 +19,8 @@ const addCourse: RequestHandler = async (req, res, next) => {
 const getCourses: RequestHandler = async (req, res, next) => {
   try {
     const queries = req.query;
-    const courses = await courseService.getCourses(queries);
-    if (courses) res.json(courses);
+    const [courses, coursesCount] = await courseService.getCourses(queries);
+    if (courses) res.json([courses, coursesCount]);
   } catch (err) {
     res.status(400).send(err.message);
   }

@@ -19,16 +19,14 @@ const addCourse = async (
 };
 
 const getCourses = async (queries?: ParsedQs) => {
-  let courses: Course[];
-
-  courses = await courseRepo.getCourses(queries);
+  const [courses, coursesCount] = await courseRepo.getCourses(queries);
   if (!courses) throw new Error("Error getting courses");
 
-  return courses;
+  return [courses, coursesCount];
 };
 
 const getCourseByID = async (id: number) => {
-  const course = courseRepo.getCourseByID(id);
+  const course = await courseRepo.getCourseByID(id);
   if (!course) throw new Error("Error getting course by ID");
   return course;
 };
