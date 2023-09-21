@@ -43,7 +43,7 @@ const getReviews = async (courseID: number) => {
 
   reviews.forEach((review) => {
     totalRating += review.star;
-    reviewCounter[review.star - 1]++;
+    reviewCounter[5 - review.star]++;
   });
 
   const averageRating = Number((totalRating / reviews.length).toFixed(1));
