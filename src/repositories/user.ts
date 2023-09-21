@@ -9,6 +9,8 @@ const findUserByID = (id: number) =>
 const findUserByUsername = (username: string) =>
   userRepo.findOneBy({ username });
 
+const findUserByEmail = (email: string) => userRepo.findOneBy({ email });
+
 const findUserByRefreshToken = (refreshToken: string) => {
   return userRepo
     .createQueryBuilder("user")
@@ -31,6 +33,11 @@ const registerUser = (username: string, email: string, password: string) => {
 
 const saveRefreshToken = async (user: User, refreshTokens: string[]) => {
   user.refreshTokens = refreshTokens;
+  return userRepo.save(user);
+};
+
+const changePassword = async (user: User, password: string) => {
+  user.password = password;
   return userRepo.save(user);
 };
 
@@ -59,9 +66,11 @@ const updateProfile = async (
 export {
   findUserByID,
   findUserByUsername,
+  findUserByEmail,
   findUserByRefreshToken,
   findExistedUser,
   registerUser,
   updateProfile,
   saveRefreshToken,
+  changePassword,
 };

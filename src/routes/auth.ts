@@ -1,6 +1,11 @@
 import express from "express";
 import * as authController from "../controllers/auth";
-import { loginVal, registerVal } from "../middlewares/validation";
+import {
+  forgetPassVal,
+  loginVal,
+  registerVal,
+  resetPassVal,
+} from "../middlewares/validation";
 import { isAuthenticated } from "../middlewares/auth";
 
 export default (router: express.Router) => {
@@ -13,4 +18,13 @@ export default (router: express.Router) => {
   router.get("/refresh", authController.handleRefreshToken);
 
   router.post("/logout", isAuthenticated, authController.logout);
+
+  router.post("/forget-password", forgetPassVal, authController.forgetPassword);
+
+  router.get(
+    "/reset-password/:username/:token",
+    authController.getResetPassword
+  );
+
+  router.post("/reset-password", resetPassVal, authController.resetPassword);
 };

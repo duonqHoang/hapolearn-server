@@ -1,23 +1,18 @@
 import bcript from "bcrypt";
 import jwt from "jsonwebtoken";
-import {
-  findExistedUser,
-  findUserByID,
-  findUserByRefreshToken,
-  findUserByUsername,
-  registerUser,
-  saveRefreshToken,
-} from "../repositories/user";
+import * as userRepo from "../repositories/user";
+import transporter from "../common/mailTransporter";
+import Mail from "nodemailer/lib/mailer";
 
 const register = async (username: string, email: string, password: string) => {
-  const existedUser = await findExistedUser(username, email);
+  const existedUser = await userRepo.findExistedUser(username, email);
   if (existedUser) {
     console.log("Username or Email is already used!");
     throw new Error("Username or Email is already used!");
   }
 
   const hashed = await bcript.hash(password, +process.env.BC_SALT_ROUNDS);
-  const newUser = await registerUser(username, email, hashed);
+  const newUser = await userRepo.registerUser(username, email, hashed);
   if (newUser) {
     console.log("Registered new user!");
     return newUser;
@@ -32,7 +27,7 @@ const login = async (
   password: string,
   refreshToken: string
 ) => {
-  const user = await findUserByUsername(username);
+  const user = await userRepo.findUserByUsername(username);
   if (!user) {
     const message: string = "A user with this username could not be found!";
     console.log(message);
@@ -83,7 +78,7 @@ const login = async (
     shouldClearToken = true;
   }
 
-  const savedUser = await saveRefreshToken(user, [
+  const savedUser = await userRepo.saveRefreshToken(user, [
     ...newRefreshTokenArr,
     newRefreshToken,
   ]);
@@ -103,8 +98,8 @@ const getLoginStatus = async (accessToken: string, refreshToken: string) => {
     );
     if (decodedAccess && decodedRefresh) return true;
   } catch (err) {
-    const user = await findUserByRefreshToken(refreshToken);
-    await saveRefreshToken(
+    const user = await userRepo.findUserByRefreshToken(refreshToken);
+    await userRepo.saveRefreshToken(
       user,
       user.refreshTokens.filter((rt) => rt !== refreshToken)
     );
@@ -119,10 +114,10 @@ const handleRefreshToken = async (refreshToken: string) => {
     decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
   } catch (err) {
     //expired refresh token
-    const expiredUser = await findUserByRefreshToken(refreshToken);
+    const expiredUser = await userRepo.findUserByRefreshToken(refreshToken);
     if (expiredUser) {
       console.log(
-        await saveRefreshToken(
+        await userRepo.saveRefreshToken(
           expiredUser,
           expiredUser.refreshTokens.filter((rt) => rt !== refreshToken)
         )
@@ -131,12 +126,12 @@ const handleRefreshToken = async (refreshToken: string) => {
     throw new Error("Invalid or expired refresh token");
   }
 
-  const user = await findUserByID(decoded.userID);
+  const user = await userRepo.findUserByID(decoded.userID);
 
   // Refresh token reuse
   if (!user.refreshTokens.includes(refreshToken)) {
     console.log("Refresh token is being reused");
-    await saveRefreshToken(user, []);
+    await userRepo.saveRefreshToken(user, []);
     throw new Error("Refresh token already used");
   }
 
@@ -158,18 +153,79 @@ const handleRefreshToken = async (refreshToken: string) => {
     { expiresIn: process.env.REFRESH_TOKEN_EXPIRE }
   );
 
-  await saveRefreshToken(user, [...newRefreshTokenArr, newRefreshToken]);
+  await userRepo.saveRefreshToken(user, [
+    ...newRefreshTokenArr,
+    newRefreshToken,
+  ]);
 
   return { accessToken, newRefreshToken };
 };
 
 const logout = async (refreshToken: string) => {
-  const user = await findUserByRefreshToken(refreshToken);
+  const user = await userRepo.findUserByRefreshToken(refreshToken);
   if (!user) throw new Error("Refresh token not found");
-  await saveRefreshToken(
+  await userRepo.saveRefreshToken(
     user,
     user.refreshTokens.filter((rt) => rt !== refreshToken)
   );
 };
 
-export { register, login, getLoginStatus, handleRefreshToken, logout };
+const forgetPassword = async (email: string) => {
+  const user = await userRepo.findUserByEmail(email);
+  if (!user) throw new Error("User not registered");
+
+  const secret = process.env.RESET_PASS_SECRET + user.password;
+
+  const token = jwt.sign(
+    { userid: user.id, username: user.username, email: user.email },
+    secret,
+    { expiresIn: process.env.RESET_PASS_EXPIRE }
+  );
+  const link = `${process.env.CLIENT_URL}/reset-password/${user.username}/${token}`;
+
+  const message: Mail.Options = {
+    from: process.env.EMAIL_ADDRESS,
+    to: email,
+    subject: "Reset password",
+    text: `Visit link to reset your password: ${link}`,
+  };
+
+  const sentInfo = await transporter.sendMail(message);
+  return sentInfo;
+};
+
+const getResetPassword = async (username: string, token: string) => {
+  const user = await userRepo.findUserByUsername(username);
+  if (!user) throw new Error("User does not exist");
+
+  const secret = process.env.RESET_PASS_SECRET + user.password;
+  const data = jwt.verify(token, secret);
+  return data;
+};
+
+const resetPassword = async (
+  username: string,
+  password: string,
+  token: string
+) => {
+  const user = await userRepo.findUserByUsername(username);
+  if (!user) throw new Error("User does not exist");
+
+  const secret = process.env.RESET_PASS_SECRET + user.password;
+  jwt.verify(token, secret);
+
+  const hashed = await bcript.hash(password, +process.env.BC_SALT_ROUNDS);
+
+  return userRepo.changePassword(user, hashed);
+};
+
+export {
+  register,
+  login,
+  getLoginStatus,
+  handleRefreshToken,
+  logout,
+  forgetPassword,
+  getResetPassword,
+  resetPassword,
+};
