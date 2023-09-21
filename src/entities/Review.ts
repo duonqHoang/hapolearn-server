@@ -4,6 +4,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
+  CreateDateColumn,
 } from "typeorm";
 import { User } from "./User";
 import { Course } from "./Course";
@@ -25,4 +26,7 @@ export class Review {
 
   @ManyToOne(() => Course, (course) => course.reviews)
   course: Course;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

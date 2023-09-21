@@ -47,4 +47,6 @@ export class Course {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  averageRating?: number;
 }

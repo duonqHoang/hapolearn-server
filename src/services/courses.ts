@@ -28,7 +28,7 @@ const getCourses = async (queries?: ParsedQs) => {
 };
 
 const getCourseByID = async (id: number) => {
-  const course = await courseRepo.findCourseByID(id);
+  const course = courseRepo.getCourseByID(id);
   if (!course) throw new Error("Error getting course by ID");
   return course;
 };

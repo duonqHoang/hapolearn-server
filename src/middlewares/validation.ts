@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { validateLogin } from "../common/validators/loginValidator";
 import { validateRegister } from "../common/validators/registerValidator";
 import { validateUpdateProfile } from "../common/validators/profileValidator";
+import { validateReview } from "../common/validators/reviewValidator";
 
 const registerVal: RequestHandler = (req, res, next) => {
   const { username, email, password } = req.body;
@@ -45,4 +46,17 @@ const profileUpdateVal: RequestHandler = (req, res, next) => {
   );
 };
 
-export { registerVal, loginVal, profileUpdateVal };
+const reviewVal: RequestHandler = (req, res, next) => {
+  const {star, comment} = req.body;
+  validateReview(+star, comment).then((errors) => {
+    if (errors.length > 0) {
+      return res.status(400).send(
+        errors.map((err) => {
+          return Object.values(err.constraints);
+        })
+      );
+    } else next();
+  })
+}
+
+export { registerVal, loginVal, profileUpdateVal, reviewVal };
