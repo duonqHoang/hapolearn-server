@@ -50,7 +50,7 @@ const profileUpdateVal: RequestHandler = (req, res, next) => {
 };
 
 const reviewVal: RequestHandler = (req, res, next) => {
-  const {star, comment} = req.body;
+  const { star, comment } = req.body;
   validateReview(+star, comment).then((errors) => {
     if (errors.length > 0) {
       return res.status(400).send(
@@ -65,7 +65,6 @@ const reviewVal: RequestHandler = (req, res, next) => {
 const forgetPassVal: RequestHandler = (req, res, next) => {
   const { email } = req.body;
   validateForget(email).then((errors) => {
-
     if (errors.length > 0) {
       return res.status(400).send(
         errors.map((err) => {
@@ -89,4 +88,11 @@ const resetPassVal: RequestHandler = (req, res, next) => {
   });
 };
 
-export { registerVal, loginVal, profileUpdateVal,reviewVal, forgetPassVal, resetPassVal };
+export {
+  registerVal,
+  loginVal,
+  profileUpdateVal,
+  reviewVal,
+  forgetPassVal,
+  resetPassVal,
+};
