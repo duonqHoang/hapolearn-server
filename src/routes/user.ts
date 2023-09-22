@@ -12,4 +12,10 @@ export default (router: Router) => {
     profileUpdateVal,
     userController.updateProfile
   );
+
+  router.get(
+    "/user/courses",
+    isAuthenticated,
+    userController.getEnrolledCourses
+  );
 };

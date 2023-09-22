@@ -27,4 +27,7 @@ export class Lesson {
 
   @OneToMany(() => Document, (document) => document.lesson)
   documents: Document[];
+
+  @Column({ type: "simple-array", nullable: true })
+  tags: string[];
 }

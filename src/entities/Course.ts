@@ -48,5 +48,8 @@ export class Course {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column({ type: "simple-array", nullable: true })
+  tags: string[];
+
   averageRating?: number;
 }

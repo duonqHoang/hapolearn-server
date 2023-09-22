@@ -29,4 +29,14 @@ const updateProfile: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { getProfile, updateProfile };
+const getEnrolledCourses: RequestHandler = async (req, res, next) => {
+  try {
+    const userID = req.body.userID;
+    const userCourses = await userServices.getEnrolledCourses(userID);
+    res.json(userCourses);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export { getProfile, updateProfile, getEnrolledCourses };

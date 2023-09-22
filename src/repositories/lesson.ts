@@ -14,6 +14,17 @@ const getLessons = async (courseID: number) => {
   });
 };
 
+const getOneLesson = async (courseID: number, lessonNumber: number) => {
+  const course = await findCourseByID(courseID);
+  if (!course) throw new Error("Cannot find course");
+  return lessonRepo.findAndCount({
+    relations: { course: true },
+    skip: lessonNumber - 1,
+    take: 1,
+    where: { course: { id: courseID } },
+  });
+};
+
 const createLesson = async (
   name: string,
   description: string,
@@ -32,4 +43,4 @@ const createLesson = async (
   return lessonRepo.save(newLesson);
 };
 
-export { createLesson, getLessons };
+export { createLesson, getLessons, getOneLesson };
