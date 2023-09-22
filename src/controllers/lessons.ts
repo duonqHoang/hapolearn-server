@@ -3,12 +3,13 @@ import * as lessonServices from "../services/lessons";
 
 const createLesson: RequestHandler = async (req, res, next) => {
   try {
-    const { name, description, requirement, courseID } = req.body;
+    const { courseID } = req.params;
+    const { name, description, requirement } = req.body;
     const newLesson = await lessonServices.createLesson(
       name,
       description,
       requirement,
-      courseID
+      +courseID
     );
     if (newLesson) {
       res.send("Created new lesson");
@@ -18,4 +19,14 @@ const createLesson: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { createLesson };
+const getLessons: RequestHandler = async (req, res, next) => {
+  try {
+    const { courseID } = req.params;
+    const data = await lessonServices.getLessons(+courseID);
+    res.send(data);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export { createLesson, getLessons };

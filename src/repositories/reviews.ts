@@ -29,4 +29,33 @@ const addReview = async (
   return reviewsRepo.save(newReview);
 };
 
-export { addReview };
+const getReviews = async (courseID: number) => {
+  const query = reviewsRepo.createQueryBuilder("review");
+  query.where("courseId = :cid", { cid: courseID });
+
+  query.leftJoin("review.user", "user");
+  query.addSelect(["review.*", "user.name", "user.avatar"]);
+
+  const reviews = await query.getMany();
+
+  const reviewCounter = [0, 0, 0, 0, 0];
+  let totalRating = 0;
+
+  reviews.forEach((review) => {
+    totalRating += review.star;
+    reviewCounter[5 - review.star]++;
+  });
+
+  const averageRating = Number((totalRating / reviews.length).toFixed(1));
+
+  const result = {
+    reviews,
+    reviewsCount: reviews.length,
+    reviewCounter,
+    averageRating,
+  };
+
+  return result;
+};
+
+export { getReviews, addReview };

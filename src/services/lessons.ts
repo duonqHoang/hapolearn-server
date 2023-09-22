@@ -16,4 +16,10 @@ const createLesson = async (
   return newLesson;
 };
 
-export { createLesson };
+const getLessons = async (courseID: number) => {
+  const data = await lessonRepo.getLessons(courseID);
+  if (!data) throw new Error("Error getting lessons");
+  return { lessons: data[0], lessonsCount: data[1] };
+};
+
+export { createLesson, getLessons };

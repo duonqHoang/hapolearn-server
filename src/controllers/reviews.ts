@@ -18,4 +18,14 @@ const addReview: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { addReview };
+const getReviews: RequestHandler = async (req, res, next) => {
+  try {
+    const courseID = req.params.courseID;
+    const data = await reviewsService.getReviews(+courseID);
+    res.json(data);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export { addReview, getReviews };

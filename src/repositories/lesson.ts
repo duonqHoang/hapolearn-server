@@ -4,6 +4,16 @@ import { findCourseByID } from "./course";
 
 const lessonRepo = AppDataSource.getRepository(Lesson);
 
+const getLessons = async (courseID: number) => {
+  const course = await findCourseByID(courseID);
+  if (!course) throw new Error("Cannot find course");
+  return lessonRepo.findAndCount({
+    relations: { course: true },
+    select: { course: {} },
+    where: { course: { id: courseID } },
+  });
+};
+
 const createLesson = async (
   name: string,
   description: string,
@@ -22,4 +32,4 @@ const createLesson = async (
   return lessonRepo.save(newLesson);
 };
 
-export { createLesson };
+export { createLesson, getLessons };
