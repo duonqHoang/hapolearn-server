@@ -21,8 +21,8 @@ const createLesson: RequestHandler = async (req, res, next) => {
 
 const getLessons: RequestHandler = async (req, res, next) => {
   try {
-    const { courseID } = req.params;
-    const data = await lessonServices.getLessons(+courseID);
+    const { courseID, lessonNumber } = req.query;
+    const data = await lessonServices.getLessons(+courseID, +lessonNumber);
     res.send(data);
   } catch (err) {
     res.status(400).send(err.message);

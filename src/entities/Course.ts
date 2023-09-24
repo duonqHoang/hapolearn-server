@@ -30,6 +30,9 @@ export class Course {
   @Column({ nullable: true })
   image: string;
 
+  @Column()
+  time: number;
+
   @ManyToMany(() => User, (user) => user.courses)
   learners: User[];
 
@@ -47,6 +50,9 @@ export class Course {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ type: "simple-array", nullable: true })
+  tags: string[];
 
   averageRating?: number;
 }

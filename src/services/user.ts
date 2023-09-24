@@ -4,6 +4,7 @@ const getProfile = async (userID: number) => {
   const user = await userRepo.findUserByID(userID);
   if (!user) throw new Error("Error getting user profile");
   delete user.password;
+  delete user.refreshTokens;
   return user;
 };
 
@@ -29,4 +30,10 @@ const updateProfile = async (
   return updated;
 };
 
-export { getProfile, updateProfile };
+const getEnrolledCourses = async (userID: number) => {
+  const user = await userRepo.findUserByID(userID);
+  if (!user) throw new Error("Error finding user");
+  return user.courses;
+};
+
+export { getProfile, updateProfile, getEnrolledCourses };
