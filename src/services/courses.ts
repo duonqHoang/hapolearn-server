@@ -6,12 +6,14 @@ const addCourse = async (
   name: string,
   description: string,
   price: number,
+  time: number,
   teacherID: number
 ) => {
   const newCourse = await courseRepo.addCourse(
     name,
     description,
     price,
+    time,
     teacherID
   );
   if (!newCourse) throw new Error("Error creating new course");

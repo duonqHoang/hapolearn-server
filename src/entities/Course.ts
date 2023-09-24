@@ -30,6 +30,9 @@ export class Course {
   @Column({ nullable: true })
   image: string;
 
+  @Column()
+  time: number;
+
   @ManyToMany(() => User, (user) => user.courses)
   learners: User[];
 

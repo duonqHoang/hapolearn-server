@@ -86,17 +86,13 @@ const login = async (
   return { accessToken, newRefreshToken, shouldClearToken };
 };
 
-const getLoginStatus = async (accessToken: string, refreshToken: string) => {
+const getLoginStatus = async (refreshToken: string) => {
   try {
-    const decodedAccess: any = jwt.verify(
-      accessToken,
-      process.env.ACCESS_TOKEN_SECRET
-    );
     const decodedRefresh: any = jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET
     );
-    if (decodedAccess && decodedRefresh) return true;
+    if (decodedRefresh) return true;
   } catch (err) {
     const user = await userRepo.findUserByRefreshToken(refreshToken);
     await userRepo.saveRefreshToken(

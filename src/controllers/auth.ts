@@ -43,13 +43,12 @@ const login: RequestHandler = async (req, res, next) => {
 
 const getLoginStatus: RequestHandler = async (req, res) => {
   try {
-    const { accessToken, refreshToken } = req.cookies;
-    const isLoggedIn = await authService.getLoginStatus(
-      accessToken,
-      refreshToken
-    );
+    const { refreshToken } = req.cookies;
+    const isLoggedIn = await authService.getLoginStatus(refreshToken);
     if (isLoggedIn) res.status(200).send("Logged in");
   } catch (err) {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
     res.status(403).send(err.message);
   }
 };
@@ -72,7 +71,9 @@ const handleRefreshToken: RequestHandler = async (req, res, next) => {
     });
     res.send("Refreshed tokens");
   } catch (err) {
-    res.status(400).send(err.message);
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(403).send(err.message);
   }
 };
 

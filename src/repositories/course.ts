@@ -4,6 +4,7 @@ import { findTeacherByID } from "./teacher";
 import { ParsedQs } from "qs";
 import { Lesson } from "../entities/Lesson";
 import { findUserByID } from "./user";
+import { Review } from "../entities/Review";
 
 const courseRepo = AppDataSource.getRepository(Course);
 
@@ -28,6 +29,7 @@ const addCourse = async (
   name: string,
   description: string,
   price: number,
+  time: number,
   teacherID: number
 ) => {
   const teacher = await findTeacherByID(teacherID);
@@ -36,6 +38,7 @@ const addCourse = async (
     name,
     description,
     price,
+    time,
     teacher,
   });
   return courseRepo.save(newCourse);
@@ -86,12 +89,31 @@ const getCourses = (queries: ParsedQs) => {
     query.addOrderBy("lessonsCount", lessons === "asc" ? "ASC" : "DESC");
   }
 
-  // if (learners) {
-  // }
+  if (learners) {
+    query.addSelect((subQuery) => {
+      return subQuery
+        .select("COUNT(*)", "learnersCount")
+        .groupBy("enrollments.courseId")
+        .from("user_courses_course", "enrollments")
+        .where("enrollments.courseId = course.id");
+    }, "learnersCount");
+    query.addOrderBy("learnersCount", learners === "asc" ? "ASC" : "DESC");
+  }
 
-  // if (time) {
-  //   query.orderBy("course.time", time === "asc" ? "ASC" : "DESC");
-  // }
+  if (time) {
+    query.addOrderBy("course.time", time === "asc" ? "ASC" : "DESC");
+  }
+
+  if (review) {
+    query.addSelect((sb) => {
+      return sb
+        .select("SUM(review.star) / COUNT(review.id)", "averageRating")
+        .groupBy("review.courseId")
+        .from(Review, "review")
+        .where("review.courseId = course.id");
+    }, "averageRating");
+    query.addOrderBy("averageRating", review === "asc" ? "ASC" : "DESC");
+  }
 
   // pagination
   query.skip(coursesPerPage * (page ? +page - 1 : 0)).take(coursesPerPage);
