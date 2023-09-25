@@ -1,7 +1,7 @@
 import * as teachersController from "../controllers/teachers";
-import express from "express";
+import { Router } from "express";
 
-export default (router: express.Router) => {
+export default (router: Router) => {
   router.get("/teachers", teachersController.getTeachers);
 
   router.post("/teachers", teachersController.addTeacher);
