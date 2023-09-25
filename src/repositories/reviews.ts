@@ -20,6 +20,9 @@ const addReview = async (
   if (!user) throw new Error("User does not exist");
   const course = await findCourseByID(courseID);
   if (!course) throw new Error("Course does not exist");
+  if (!user.courses.find((course) => course.id === courseID)) {
+    throw new Error("You must enroll the course to make review");
+  }
   const newReview = reviewsRepo.create({
     star,
     comment,
