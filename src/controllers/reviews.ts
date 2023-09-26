@@ -28,4 +28,13 @@ const getReviews: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { addReview, getReviews };
+const getHighReviews: RequestHandler = async (req, res, next) => {
+  try {
+    const reviews = await reviewsService.getHighReviews();
+    res.json(reviews);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+export { addReview, getReviews, getHighReviews };

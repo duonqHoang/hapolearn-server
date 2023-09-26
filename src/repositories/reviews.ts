@@ -61,4 +61,18 @@ const getReviews = async (courseID: number) => {
   return result;
 };
 
-export { getReviews, addReview };
+const getHighReviews = () => {
+  return reviewsRepo.find({
+    relations: { course: true, user: true },
+    select: {
+      id: true,
+      star: true,
+      comment: true,
+      course: { name: true },
+      user: { name: true, avatar: true },
+    },
+    order: { star: "DESC" },
+    take: 5,
+  });
+};
+export { getReviews, addReview, getHighReviews };
