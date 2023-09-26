@@ -1,4 +1,6 @@
 import * as userRepo from "../repositories/user";
+import formidable from "formidable";
+import fs from "fs";
 
 const getProfile = async (userID: number) => {
   const user = await userRepo.findUserByID(userID);
@@ -30,10 +32,35 @@ const updateProfile = async (
   return updated;
 };
 
+const changeAvatar = async (req: any) => {
+  const { userID } = req.body;
+  const user = await userRepo.findUserByID(+userID);
+  if (!user) throw new Error("User not found");
+
+  const form = formidable({
+    uploadDir: "public/images",
+    keepExtensions: true,
+    maxFiles: 1,
+    maxFields: 0,
+  });
+
+  const [_, files] = await form.parse(req);
+  fs.rename(files.avatar[0].filepath, files.avatar[0].filepath, (err) => {
+    if (err) throw err;
+  });
+
+  fs.unlink(__dirname + "\\..\\..\\public\\images\\" + user.avatar, (err) => {
+    if (err) throw err;
+  });
+
+  const saved = await userRepo.changeAvatar(user, files.avatar[0].newFilename);
+  return saved;
+};
+
 const getEnrolledCourses = async (userID: number) => {
   const user = await userRepo.findUserByID(userID);
   if (!user) throw new Error("Error finding user");
   return user.courses;
 };
 
-export { getProfile, updateProfile, getEnrolledCourses };
+export { getProfile, updateProfile, changeAvatar, getEnrolledCourses };

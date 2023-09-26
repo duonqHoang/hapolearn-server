@@ -27,6 +27,12 @@ const getCourses = async (queries?: ParsedQs) => {
   return [courses, coursesCount];
 };
 
+const getBestCourses = async () => {
+  const courses = await courseRepo.getBestCourses();
+  if (!courses) throw new Error("Error getting best courses");
+  return courses;
+};
+
 const getCourseByID = async (id: number) => {
   const course = await courseRepo.getCourseByID(id);
   if (!course) throw new Error("Error getting course by ID");
@@ -45,4 +51,11 @@ const unenrollCourse = async (courseID: number, userID: number) => {
   return savedCourse;
 };
 
-export { addCourse, getCourses, getCourseByID, enrollCourse, unenrollCourse };
+export {
+  addCourse,
+  getCourses,
+  getBestCourses,
+  getCourseByID,
+  enrollCourse,
+  unenrollCourse,
+};

@@ -27,6 +27,15 @@ const getCourses: RequestHandler = async (req, res, next) => {
   }
 };
 
+const getBestCourses: RequestHandler = async (req, res, next) => {
+  try {
+    const courses = await courseService.getBestCourses();
+    res.json(courses);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
 const getCourseByID: RequestHandler = async (req, res, next) => {
   try {
     const id = +req.params.courseID;
@@ -60,4 +69,11 @@ const unenrollCourse: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { addCourse, getCourses, getCourseByID, enrollCourse, unenrollCourse };
+export {
+  addCourse,
+  getCourses,
+  getBestCourses,
+  getCourseByID,
+  enrollCourse,
+  unenrollCourse,
+};

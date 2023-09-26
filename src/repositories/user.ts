@@ -63,6 +63,11 @@ const updateProfile = async (
   return userRepo.save(user);
 };
 
+const changeAvatar = (user: User, imgName: string) => {
+  user.avatar = imgName;
+  return userRepo.save(user);
+};
+
 export {
   findUserByID,
   findUserByUsername,
@@ -73,4 +78,5 @@ export {
   updateProfile,
   saveRefreshToken,
   changePassword,
+  changeAvatar,
 };

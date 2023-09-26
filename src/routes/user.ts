@@ -13,6 +13,8 @@ export default (router: Router) => {
     userController.updateProfile
   );
 
+  router.put("/user/avatar", isAuthenticated, userController.changeAvatar)
+
   router.get(
     "/user/courses",
     isAuthenticated,

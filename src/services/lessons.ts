@@ -16,9 +16,14 @@ const createLesson = async (
   return newLesson;
 };
 
-const getLessons = async (courseID: number, lessonNumber: number) => {
+const getLessons = async (
+  courseID: number,
+  page: number,
+  s: string,
+  lessonNumber: number
+) => {
   let data;
-  if (!lessonNumber) data = await lessonRepo.getLessons(courseID);
+  if (!lessonNumber) data = await lessonRepo.getLessons(courseID, page, s);
   else data = await lessonRepo.getOneLesson(courseID, lessonNumber);
   if (!data) throw new Error("Error getting lessons");
   return { lessons: data[0], lessonsCount: data[1] };

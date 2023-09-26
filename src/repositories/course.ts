@@ -44,15 +44,6 @@ const addCourse = async (
   return courseRepo.save(newCourse);
 };
 
-const getAllCourses = () => {
-  return courseRepo.find({
-    relations: {
-      lessons: true,
-      learners: true,
-    },
-  });
-};
-
 const getCourses = (queries: ParsedQs) => {
   const { page, s, date, teacher, learners, time, lessons, tag, review } =
     queries;
@@ -121,6 +112,20 @@ const getCourses = (queries: ParsedQs) => {
   return query.getManyAndCount();
 };
 
+const getBestCourses = async () => {
+  const query = courseRepo.createQueryBuilder("course");
+  query.addSelect((sb) => {
+    return sb
+      .select("SUM(review.star) / COUNT(review.id)", "averageRating")
+      .groupBy("review.courseId")
+      .from(Review, "review")
+      .where("review.courseId = course.id");
+  }, "averageRating");
+  query.addOrderBy("averageRating", "DESC");
+  query.take(6);
+  return query.getMany();
+};
+
 const enrollCourse = async (courseID: number, userID: number) => {
   const course = await courseRepo.findOne({
     relations: { learners: true },
@@ -160,8 +165,8 @@ export {
   findCourseByID,
   getCourseByID,
   addCourse,
-  getAllCourses,
   getCourses,
+  getBestCourses,
   enrollCourse,
   unenrollCourse,
 };

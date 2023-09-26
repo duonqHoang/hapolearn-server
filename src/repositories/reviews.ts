@@ -20,6 +20,9 @@ const addReview = async (
   if (!user) throw new Error("User does not exist");
   const course = await findCourseByID(courseID);
   if (!course) throw new Error("Course does not exist");
+  if (!user.courses.find((course) => course.id === courseID)) {
+    throw new Error("You must enroll the course to make review");
+  }
   const newReview = reviewsRepo.create({
     star,
     comment,
@@ -58,4 +61,18 @@ const getReviews = async (courseID: number) => {
   return result;
 };
 
-export { getReviews, addReview };
+const getHighReviews = () => {
+  return reviewsRepo.find({
+    relations: { course: true, user: true },
+    select: {
+      id: true,
+      star: true,
+      comment: true,
+      course: { name: true },
+      user: { name: true, avatar: true },
+    },
+    order: { star: "DESC" },
+    take: 5,
+  });
+};
+export { getReviews, addReview, getHighReviews };

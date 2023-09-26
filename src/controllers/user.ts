@@ -29,6 +29,15 @@ const updateProfile: RequestHandler = async (req, res, next) => {
   }
 };
 
+const changeAvatar: RequestHandler = async (req, res, next) => {
+  try {
+    const updated = await userServices.changeAvatar(req);
+    res.json(updated);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
 const getEnrolledCourses: RequestHandler = async (req, res, next) => {
   try {
     const userID = req.body.userID;
@@ -39,4 +48,4 @@ const getEnrolledCourses: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { getProfile, updateProfile, getEnrolledCourses };
+export { getProfile, updateProfile, changeAvatar, getEnrolledCourses };

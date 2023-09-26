@@ -7,4 +7,10 @@ const addTeacher = async (name: string, role: string, bio?: string) => {
   return newTeacher;
 };
 
-export { addTeacher };
+const getTeachers = async () => {
+  const teachers = await teacherRepo.getTeachers();
+  if (!teachers) throw new Error("Error getting teachers");
+  return teachers;
+};
+
+export { addTeacher, getTeachers };

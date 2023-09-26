@@ -6,6 +6,12 @@ const getReviews = async (courseID: number) => {
   return reviews;
 };
 
+const getHighReviews = async () => {
+  const reviews = await reviewsRepo.getHighReviews();
+  if (!reviews) throw new Error("Error getting highest reviews");
+  return reviews;
+};
+
 const addReview = async (
   courseID: number,
   userID: number,
@@ -22,4 +28,4 @@ const addReview = async (
   return newReview;
 };
 
-export { addReview, getReviews };
+export { addReview, getReviews, getHighReviews };

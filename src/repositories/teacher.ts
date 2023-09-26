@@ -14,4 +14,8 @@ const addTeacher = (name: string, role: string, bio?: string) => {
   return teacherRepo.save(newTeacher);
 };
 
-export { findTeacherByID, addTeacher };
+const getTeachers = () => {
+  return teacherRepo.find({ select: { id: true, name: true } });
+};
+
+export { findTeacherByID, addTeacher, getTeachers };

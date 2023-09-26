@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import * as authController from "../controllers/auth";
 import {
   forgetPassVal,
@@ -8,7 +8,7 @@ import {
 } from "../middlewares/validation";
 import { isAuthenticated } from "../middlewares/auth";
 
-export default (router: express.Router) => {
+export default (router: Router) => {
   router.post("/register", registerVal, authController.register);
 
   router.post("/login", loginVal, authController.login);
