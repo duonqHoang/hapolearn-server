@@ -1,24 +1,18 @@
 import { RequestHandler } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { findUserByID } from "repositories/user";
-
-interface UserJWTPayload extends JwtPayload {
-  userID: number;
-}
+import jwt from "jsonwebtoken";
 
 const isAuthenticated: RequestHandler = async (req, res, next) => {
   try {
-    const decodedToken = <UserJWTPayload>(
-      jwt.verify(req.cookies.jwt, process.env.JWT_SECRET)
+    const decodedToken: any = jwt.verify(
+      req.cookies.accessToken,
+      process.env.ACCESS_TOKEN_SECRET
     );
+
     const userID = decodedToken.userID;
-    const user = await findUserByID(userID);
-    if (user) {
-      req.body.userID = userID;
-      next();
-    } else throw new Error("User not found");
+    req.body.userID = userID;
+    next();
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(401).send(err.message);
   }
 };
 

@@ -1,10 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { User } from "./User";
 import { Review } from "./Review";
@@ -16,27 +18,41 @@ export class Course {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false })
+  @Column()
   name: string;
 
-  @Column({ type: "text", nullable: false })
+  @Column({ type: "text" })
   description: string;
 
   @Column({ type: "double" })
   price: number;
 
-  @Column()
+  @Column({ nullable: true })
   image: string;
+
+  @Column()
+  time: number;
 
   @ManyToMany(() => User, (user) => user.courses)
   learners: User[];
 
-  @OneToMany(() => Review, (review) => review.course)
+  @OneToMany(() => Review, (review) => review.course, { cascade: true })
   reviews: Review[];
 
-  @OneToMany(() => Lesson, (lesson) => lesson.course)
+  @OneToMany(() => Lesson, (lesson) => lesson.course, { cascade: true })
   lessons: Lesson[];
 
-  @ManyToOne(() => Teacher, (teacher) => teacher.courses)
+  @ManyToOne(() => Teacher, (teacher) => teacher.courses, { cascade: true })
   teacher: Teacher;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @Column({ type: "simple-array", nullable: true })
+  tags: string[];
+
+  averageRating?: number;
 }
