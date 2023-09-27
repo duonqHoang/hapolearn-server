@@ -14,9 +14,16 @@ const getCourseByID = async (id: number) => {
   const query = courseRepo
     .createQueryBuilder("course")
     .where("course.id = :courseID", { courseID: id })
-    .leftJoin("course.teacher", "teacher");
+    .leftJoin("course.teacher", "teacher")
+    .leftJoin("teacher.user", "user");
 
-  query.addSelect(["course.*", "teacher"]);
+  query.addSelect([
+    "course.*",
+    "teacher",
+    "user.name",
+    "user.avatar",
+    "user.bio",
+  ]);
 
   // get learners and lessons counts
   query.loadRelationCountAndMap("course.lessonsCount", "course.lessons");

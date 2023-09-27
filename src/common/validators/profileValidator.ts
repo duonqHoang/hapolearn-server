@@ -11,6 +11,7 @@ class ProfileForm {
   @IsOptional()
   name: string;
 
+  @IsOptional()
   @IsEmail()
   email: string;
 

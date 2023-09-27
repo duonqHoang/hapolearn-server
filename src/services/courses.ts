@@ -21,7 +21,7 @@ const addCourse = async (req: any) => {
     files.image[0].newFilename,
     +fields.price[0],
     +fields.time[0],
-    +fields.teacherID[0]
+    +req.body.teacherID
   );
 
   if (!newCourse) throw new Error("Error creating new course");

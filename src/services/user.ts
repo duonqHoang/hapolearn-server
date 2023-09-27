@@ -3,7 +3,7 @@ import formidable from "formidable";
 import fs from "fs";
 
 const getProfile = async (userID: number) => {
-  const user = await userRepo.findUserByID(userID);
+  const user = await userRepo.getProfileByID(userID);
   if (!user) throw new Error("Error getting user profile");
   delete user.password;
   delete user.refreshTokens;

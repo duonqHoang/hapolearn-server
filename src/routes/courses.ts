@@ -1,9 +1,14 @@
-import { isAuthenticated } from "../middlewares/auth";
+import { isAuthenticated, isTeacher } from "../middlewares/auth";
 import * as courseController from "../controllers/courses";
 import { Router } from "express";
 
 export default (router: Router) => {
-  router.post("/courses", courseController.addCourse);
+  router.post(
+    "/courses",
+    isAuthenticated,
+    isTeacher,
+    courseController.addCourse
+  );
 
   router.get("/courses", courseController.getCourses);
 

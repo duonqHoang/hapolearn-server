@@ -1,8 +1,8 @@
-import { Teacher } from "entities/Teacher";
 import * as teacherRepo from "../repositories/teacher";
+import { register } from "./auth";
 
-const addTeacher = async (name: string, role: string, bio?: string) => {
-  const newTeacher = await teacherRepo.addTeacher(name, role, bio);
+const addTeacher = async (userID: number, role: string) => {
+  const newTeacher = await teacherRepo.addTeacher(userID, role);
   if (!newTeacher) throw new Error("Cannot create teacher!");
   return newTeacher;
 };

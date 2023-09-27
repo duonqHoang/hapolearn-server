@@ -4,7 +4,7 @@ import * as courseService from "../services/courses";
 const addCourse: RequestHandler = async (req, res, next) => {
   try {
     const newCourse = await courseService.addCourse(req);
-    if (newCourse) res.send("Created new course");
+    if (newCourse) res.json(newCourse);
   } catch (err) {
     res.status(400).send(err.message);
   }

@@ -2,9 +2,9 @@ import { RequestHandler } from "express";
 import * as teacherServices from "../services/teachers";
 
 const addTeacher: RequestHandler = async (req, res, next) => {
-  const { name, role, bio } = req.body;
+  const { userID, role } = req.body;
   try {
-    const newTeacher = await teacherServices.addTeacher(name, role, bio);
+    const newTeacher = await teacherServices.addTeacher(userID, role);
     if (newTeacher) res.send("Created new teacher");
   } catch (err) {
     res.status(400).send("Error creating new teacher");
