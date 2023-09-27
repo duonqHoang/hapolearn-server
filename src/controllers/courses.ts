@@ -2,15 +2,8 @@ import { RequestHandler } from "express";
 import * as courseService from "../services/courses";
 
 const addCourse: RequestHandler = async (req, res, next) => {
-  const { name, description, price, time, teacherID } = req.body;
   try {
-    const newCourse = await courseService.addCourse(
-      name,
-      description,
-      price,
-      time,
-      teacherID
-    );
+    const newCourse = await courseService.addCourse(req);
     if (newCourse) res.send("Created new course");
   } catch (err) {
     res.status(400).send(err.message);
