@@ -22,11 +22,9 @@ const getLessons = async (courseID: number, page: number, s: string) => {
 const getOneLesson = async (courseID: number, lessonNumber: number) => {
   const course = await findCourseByID(courseID);
   if (!course) throw new Error("Cannot find course");
-  return lessonRepo.findAndCount({
-    relations: { course: true },
-    skip: lessonNumber - 1,
-    take: 1,
-    where: { course: { id: courseID } },
+  return lessonRepo.findOneBy({
+    id: lessonNumber,
+    course: { id: courseID },
   });
 };
 

@@ -1,21 +1,29 @@
-import { Course } from "entities/Course";
 import * as courseRepo from "../repositories/course";
 import { ParsedQs } from "qs";
+import formidable from "formidable";
+import fs from "fs";
 
-const addCourse = async (
-  name: string,
-  description: string,
-  price: number,
-  time: number,
-  teacherID: number
-) => {
+const addCourse = async (req: any) => {
+  const form = formidable({
+    uploadDir: "public/images",
+    keepExtensions: true,
+    maxFiles: 1,
+  });
+  const [fields, files] = await form.parse(req);
+
+  fs.rename(files.image[0].filepath, files.image[0].filepath, (err) => {
+    if (err) throw err;
+  });
+
   const newCourse = await courseRepo.addCourse(
-    name,
-    description,
-    price,
-    time,
-    teacherID
+    fields.name[0],
+    fields.description[0],
+    files.image[0].newFilename,
+    +fields.price[0],
+    +fields.time[0],
+    +fields.teacherID[0]
   );
+
   if (!newCourse) throw new Error("Error creating new course");
   return newCourse;
 };

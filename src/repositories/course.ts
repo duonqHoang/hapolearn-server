@@ -28,6 +28,7 @@ const getCourseByID = async (id: number) => {
 const addCourse = async (
   name: string,
   description: string,
+  image: string,
   price: number,
   time: number,
   teacherID: number
@@ -37,6 +38,7 @@ const addCourse = async (
   const newCourse = courseRepo.create({
     name,
     description,
+    image,
     price,
     time,
     teacher,
