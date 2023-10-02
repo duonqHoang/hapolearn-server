@@ -27,4 +27,6 @@ export default (router: Router) => {
     isAuthenticated,
     courseController.unenrollCourse
   );
+
+  router.delete("/courses/:courseID", isAuthenticated, isTeacher, courseController.deleteCourse);
 };

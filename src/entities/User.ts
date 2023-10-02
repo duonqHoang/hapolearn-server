@@ -47,7 +47,10 @@ export class User {
   @Column({ type: "simple-array", nullable: true })
   refreshTokens: string[];
 
-  @ManyToMany(() => Course, (course) => course.learners, { cascade: true })
+  @ManyToMany(() => Course, (course) => course.learners, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   @JoinTable()
   courses: Course[];
 

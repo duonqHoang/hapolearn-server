@@ -62,6 +62,17 @@ const unenrollCourse: RequestHandler = async (req, res, next) => {
   }
 };
 
+const deleteCourse: RequestHandler = async (req, res, next) => {
+  const courseID = req.params.courseID;
+  const { teacherID } = req.body;
+  try {
+    await courseService.deleteCourse(+courseID, +teacherID);
+    res.send("Deleted course");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   addCourse,
   getCourses,
@@ -69,4 +80,5 @@ export {
   getCourseByID,
   enrollCourse,
   unenrollCourse,
+  deleteCourse,
 };

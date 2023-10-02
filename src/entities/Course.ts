@@ -33,16 +33,16 @@ export class Course {
   @Column()
   time: number;
 
-  @ManyToMany(() => User, (user) => user.courses)
+  @ManyToMany(() => User, (user) => user.courses, { onDelete: "CASCADE" })
   learners: User[];
 
-  @OneToMany(() => Review, (review) => review.course, { cascade: true })
+  @OneToMany(() => Review, (review) => review.course)
   reviews: Review[];
 
   @OneToMany(() => Lesson, (lesson) => lesson.course, { cascade: true })
   lessons: Lesson[];
 
-  @ManyToOne(() => Teacher, (teacher) => teacher.courses, { cascade: true })
+  @ManyToOne(() => Teacher, (teacher) => teacher.courses)
   teacher: Teacher;
 
   @CreateDateColumn()

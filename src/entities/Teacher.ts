@@ -19,7 +19,7 @@ export class Teacher {
   @Column({ type: "json", nullable: true })
   links: { google: string; facebook: string; slack: string };
 
-  @OneToMany(() => Course, (course) => course.teacher)
+  @OneToMany(() => Course, (course) => course.teacher, { cascade: true })
   courses: Course[];
 
   @OneToOne(() => User, (user) => user.teacherProfile)

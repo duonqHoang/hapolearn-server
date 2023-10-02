@@ -10,6 +10,9 @@ const courseRepo = AppDataSource.getRepository(Course);
 
 const findCourseByID = (id: number) => courseRepo.findOneBy({ id });
 
+const getTeacherCourses = (teacherID: number) =>
+  courseRepo.findBy({ teacher: { id: teacherID } });
+
 const getCourseByID = async (id: number) => {
   const query = courseRepo
     .createQueryBuilder("course")
@@ -38,7 +41,8 @@ const addCourse = async (
   image: string,
   price: number,
   time: number,
-  teacherID: number
+  teacherID: number,
+  lessons: Array<{ name: string; time: number }>
 ) => {
   const teacher = await findTeacherByID(teacherID);
   if (!teacher) throw new Error("Cannot find teacher");
@@ -49,6 +53,13 @@ const addCourse = async (
     price,
     time,
     teacher,
+  });
+
+  lessons.forEach((lesson) => {
+    const newLesson = new Lesson();
+    newLesson.name = lesson.name;
+    newLesson.time = lesson.time;
+    newCourse.lessons = [...(newCourse.lessons || []), newLesson];
   });
   return courseRepo.save(newCourse);
 };
@@ -170,12 +181,18 @@ const unenrollCourse = async (courseID: number, userID: number) => {
   return courseRepo.save(course);
 };
 
+const deleteCourse = (course: Course) => {
+  return courseRepo.delete({ id: course.id });
+};
+
 export {
   findCourseByID,
+  getTeacherCourses,
   getCourseByID,
   addCourse,
   getCourses,
   getBestCourses,
   enrollCourse,
   unenrollCourse,
+  deleteCourse,
 };
