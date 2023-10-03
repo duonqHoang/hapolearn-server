@@ -57,7 +57,7 @@ export class User {
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
 
-  @OneToOne(() => Teacher, (teacher) => teacher.user)
+  @OneToOne(() => Teacher, (teacher) => teacher.user, { cascade: true })
   @JoinColumn()
   teacherProfile: Teacher;
 }

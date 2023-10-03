@@ -3,8 +3,9 @@ import { ParsedQs } from "qs";
 import formidable from "formidable";
 import fs from "fs";
 import { findTeacherByID } from "../repositories/teacher";
+import { Request } from "express";
 
-const addCourse = async (req: any) => {
+const addCourse = async (req: Request) => {
   const form = formidable({
     uploadDir: "public/images",
     keepExtensions: true,
@@ -17,8 +18,6 @@ const addCourse = async (req: any) => {
   fs.rename(files.image[0].filepath, files.image[0].filepath, (err) => {
     if (err) throw err;
   });
-
-  console.log(JSON.parse(fields.lessons[0]));
 
   const newCourse = await courseRepo.addCourse(
     fields.name[0],
@@ -65,6 +64,46 @@ const unenrollCourse = async (courseID: number, userID: number) => {
   return savedCourse;
 };
 
+const updateCourse = async (req: Request) => {
+  const courseID = req.params.courseID;
+
+  const course = await courseRepo.findCourseByID(+courseID);
+  if (!course) throw new Error("Course does not exist");
+
+  const form = formidable({
+    uploadDir: "public/images",
+    keepExtensions: true,
+    maxFiles: 1,
+    multiples: true,
+  });
+
+  const [fields, files] = await form.parse(req);
+
+  if (files.image && files.image[0]) {
+    fs.unlink(
+      __dirname + "\\..\\..\\public\\images\\" + course.image,
+      () => {}
+    );
+
+    fs.rename(files.image[0].filepath, files.image[0].filepath, (err) => {
+      if (err) throw err;
+    });
+  }
+
+  const updatedCourse = await courseRepo.updateCourse(
+    course,
+    fields.name[0],
+    fields.description[0],
+    files.image ? files.image[0].newFilename : null,
+    +fields.price[0],
+    +fields.time[0],
+    JSON.parse(fields.lessons[0])
+  );
+
+  if (!updatedCourse) throw new Error("Error creating new course");
+  return updatedCourse;
+};
+
 const deleteCourse = async (courseID: number, teacherID: number) => {
   const course = await courseRepo.findCourseByID(courseID);
   if (!course) throw new Error("Error finding course");
@@ -73,6 +112,15 @@ const deleteCourse = async (courseID: number, teacherID: number) => {
   const teacherCourses = await courseRepo.getTeacherCourses(teacherID);
   if (!teacherCourses.find((course) => course.id === courseID))
     throw new Error("Course belongs to another teacher");
+
+  if (course.image) {
+    fs.unlink(
+      __dirname + "\\..\\..\\public\\images\\" + course.image,
+      (err) => {
+        if (err) throw err;
+      }
+    );
+  }
 
   const deleted = await courseRepo.deleteCourse(course);
   return deleted;
@@ -85,5 +133,6 @@ export {
   getCourseByID,
   enrollCourse,
   unenrollCourse,
+  updateCourse,
   deleteCourse,
 };

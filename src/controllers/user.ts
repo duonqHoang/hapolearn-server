@@ -12,7 +12,7 @@ const getProfile: RequestHandler = async (req, res, next) => {
 };
 
 const updateProfile: RequestHandler = async (req, res, next) => {
-  const { name, email, dob, phone, address, bio } = req.body;
+  const { name, email, dob, phone, address, bio, role } = req.body;
   try {
     const updatedProfile = await userServices.updateProfile(
       req.body.userID,
@@ -21,7 +21,8 @@ const updateProfile: RequestHandler = async (req, res, next) => {
       dob,
       phone,
       address,
-      bio
+      bio,
+      role
     );
     if (updatedProfile) res.send("Updated user profile");
   } catch (err) {

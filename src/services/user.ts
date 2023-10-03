@@ -17,7 +17,8 @@ const updateProfile = async (
   dob: string,
   phone: string,
   address: string,
-  bio: string
+  bio: string,
+  role: string
 ) => {
   const updated = await userRepo.updateProfile(
     id,
@@ -26,7 +27,8 @@ const updateProfile = async (
     dob,
     phone,
     address,
-    bio
+    bio,
+    role
   );
   if (!updated) throw new Error("Error updating user profile");
   return updated;

@@ -57,9 +57,13 @@ const updateProfile = async (
   dob: string,
   phone: string,
   address: string,
-  bio: string
+  bio: string,
+  role: string
 ) => {
-  const user = await userRepo.findOneBy({ id });
+  const user = await userRepo.findOne({
+    relations: { teacherProfile: true },
+    where: { id },
+  });
   if (!user) throw new Error("Error finding user profile");
   if (name) user.name = name;
   if (email) user.email = email;
@@ -67,6 +71,9 @@ const updateProfile = async (
   if (phone) user.phone = phone;
   if (address) user.address = address;
   if (bio) user.bio = bio;
+  if (role && user.teacherProfile) {
+    user.teacherProfile.role = role;
+  }
   return userRepo.save(user);
 };
 

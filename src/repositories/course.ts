@@ -181,6 +181,31 @@ const unenrollCourse = async (courseID: number, userID: number) => {
   return courseRepo.save(course);
 };
 
+const updateCourse = (
+  course: Course,
+  name: string,
+  description: string,
+  image: string,
+  price: number,
+  time: number,
+  lessons: Array<{ name: string; time: number }>
+) => {
+  if (name) course.name = name;
+  if (description) course.description = description;
+  if (image) course.image = image;
+  if (price) course.price = price;
+  if (time) course.time = time;
+  if (lessons?.length > 0) {
+    course.lessons = lessons.map((item) => {
+      const lesson = new Lesson();
+      lesson.name = item.name;
+      lesson.time = item.time;
+      return lesson;
+    });
+  }
+  return courseRepo.save(course);
+};
+
 const deleteCourse = (course: Course) => {
   return courseRepo.delete({ id: course.id });
 };
@@ -194,5 +219,6 @@ export {
   getBestCourses,
   enrollCourse,
   unenrollCourse,
+  updateCourse,
   deleteCourse,
 };

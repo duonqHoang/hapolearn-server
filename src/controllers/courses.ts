@@ -62,6 +62,15 @@ const unenrollCourse: RequestHandler = async (req, res, next) => {
   }
 };
 
+const updateCourse: RequestHandler = async (req, res, next) => {
+  try {
+    await courseService.updateCourse(req);
+    res.send("Updated course successfully!");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
 const deleteCourse: RequestHandler = async (req, res, next) => {
   const courseID = req.params.courseID;
   const { teacherID } = req.body;
@@ -80,5 +89,6 @@ export {
   getCourseByID,
   enrollCourse,
   unenrollCourse,
+  updateCourse,
   deleteCourse,
 };

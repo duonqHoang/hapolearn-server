@@ -35,8 +35,8 @@ const loginVal: RequestHandler = (req, res, next) => {
 };
 
 const profileUpdateVal: RequestHandler = (req, res, next) => {
-  const { name, email, dob, phone, address, bio } = req.body;
-  validateUpdateProfile(name, email, dob, phone, address, bio).then(
+  const { name, email, dob, phone, address, bio, role } = req.body;
+  validateUpdateProfile(name, email, dob, phone, address, bio, role).then(
     (errors) => {
       if (errors.length > 0) {
         return res.status(400).send(
