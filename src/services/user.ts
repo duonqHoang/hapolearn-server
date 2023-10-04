@@ -52,9 +52,7 @@ const changeAvatar = async (req: any) => {
   });
 
   if (user.avatar) {
-    fs.unlink(__dirname + "\\..\\..\\public\\images\\" + user.avatar, (err) => {
-      if (err) throw err;
-    });
+    fs.unlink(__dirname + "\\..\\..\\public\\images\\" + user.avatar, () => {});
   }
 
   const saved = await userRepo.changeAvatar(user, files.avatar[0].newFilename);

@@ -12,6 +12,8 @@ export default (router: Router) => {
 
   router.get("/courses", courseController.getCourses);
 
+  router.get("/courses-stats", courseController.getCoursesStats);
+
   router.get("/best-courses", courseController.getBestCourses);
 
   router.get("/courses/:courseID", courseController.getCourseByID);

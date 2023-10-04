@@ -15,6 +15,8 @@ const getProfileByID = (id: number) =>
     where: { id },
   });
 
+const getUsersCount = () => userRepo.count();
+
 const findUserByUsername = (username: string) =>
   userRepo.findOneBy({ username });
 
@@ -85,6 +87,7 @@ const changeAvatar = (user: User, imgName: string) => {
 export {
   findUserByID,
   getProfileByID,
+  getUsersCount,
   findUserByUsername,
   findUserByEmail,
   findUserByRefreshToken,

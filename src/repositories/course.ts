@@ -3,8 +3,9 @@ import { AppDataSource } from "../data-source";
 import { findTeacherByID } from "./teacher";
 import { ParsedQs } from "qs";
 import { Lesson } from "../entities/Lesson";
-import { findUserByID } from "./user";
+import { findUserByID, getUsersCount } from "./user";
 import { Review } from "../entities/Review";
+import { getLessonsCount } from "./lesson";
 
 const courseRepo = AppDataSource.getRepository(Course);
 
@@ -28,6 +29,14 @@ const getCourseByID = async (id: number) => {
     "user.bio",
   ]);
 
+  query.addSelect((subQuery) => {
+    return subQuery
+      .select("SUM(lesson.time)", "time")
+      .groupBy("lesson.courseId")
+      .from(Lesson, "lesson")
+      .where("lesson.courseId = course.id");
+  }, "course_time");
+
   // get learners and lessons counts
   query.loadRelationCountAndMap("course.lessonsCount", "course.lessons");
   query.loadRelationCountAndMap("course.learnersCount", "course.learners");
@@ -40,7 +49,6 @@ const addCourse = async (
   description: string,
   image: string,
   price: number,
-  time: number,
   teacherID: number,
   lessons: Array<{ name: string; time: number }>
 ) => {
@@ -51,7 +59,6 @@ const addCourse = async (
     description,
     image,
     price,
-    time,
     teacher,
   });
 
@@ -74,6 +81,14 @@ const getCourses = (queries: ParsedQs) => {
   // load lessons and learners counts
   query.loadRelationCountAndMap("course.lessonsCount", "course.lessons");
   query.loadRelationCountAndMap("course.learnersCount", "course.learners");
+
+  query.addSelect((subQuery) => {
+    return subQuery
+      .select("SUM(lesson.time)", "time")
+      .groupBy("lesson.courseId")
+      .from(Lesson, "lesson")
+      .where("lesson.courseId = course.id");
+  }, "course_time");
 
   // filters
   if (s) {
@@ -112,7 +127,7 @@ const getCourses = (queries: ParsedQs) => {
   }
 
   if (time) {
-    query.addOrderBy("course.time", time === "asc" ? "ASC" : "DESC");
+    query.addOrderBy("course_time", time === "asc" ? "ASC" : "DESC");
   }
 
   if (review) {
@@ -130,6 +145,13 @@ const getCourses = (queries: ParsedQs) => {
   query.skip(coursesPerPage * (page ? +page - 1 : 0)).take(coursesPerPage);
 
   return query.getManyAndCount();
+};
+
+const getCoursesStats = async () => {
+  const coursesCount = await courseRepo.count();
+  const learnersCount = await getUsersCount();
+  const lessonsCount = await getLessonsCount();
+  return { coursesCount, lessonsCount, learnersCount };
 };
 
 const getBestCourses = async () => {
@@ -187,14 +209,12 @@ const updateCourse = (
   description: string,
   image: string,
   price: number,
-  time: number,
   lessons: Array<{ name: string; time: number }>
 ) => {
   if (name) course.name = name;
   if (description) course.description = description;
   if (image) course.image = image;
   if (price) course.price = price;
-  if (time) course.time = time;
   if (lessons?.length > 0) {
     course.lessons = lessons.map((item) => {
       const lesson = new Lesson();
@@ -216,6 +236,7 @@ export {
   getCourseByID,
   addCourse,
   getCourses,
+  getCoursesStats,
   getBestCourses,
   enrollCourse,
   unenrollCourse,

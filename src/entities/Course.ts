@@ -30,9 +30,6 @@ export class Course {
   @Column({ nullable: true })
   image: string;
 
-  @Column()
-  time: number;
-
   @ManyToMany(() => User, (user) => user.courses, { onDelete: "CASCADE" })
   learners: User[];
 
@@ -54,5 +51,6 @@ export class Course {
   @Column({ type: "simple-array", nullable: true })
   tags: string[];
 
-  averageRating?: number;
+  @Column({ select: false })
+  time: number;
 }

@@ -24,7 +24,6 @@ const addCourse = async (req: Request) => {
     fields.description[0],
     files.image[0].newFilename,
     +fields.price[0],
-    +fields.time[0],
     +req.body.teacherID,
     JSON.parse(fields.lessons[0])
   );
@@ -38,6 +37,12 @@ const getCourses = async (queries?: ParsedQs) => {
   if (!courses) throw new Error("Error getting courses");
 
   return [courses, coursesCount];
+};
+
+const getCoursesStats = async () => {
+  const stats = await courseRepo.getCoursesStats();
+  if (!stats) throw new Error("Error getting statistics");
+  return stats;
 };
 
 const getBestCourses = async () => {
@@ -96,7 +101,6 @@ const updateCourse = async (req: Request) => {
     fields.description[0],
     files.image ? files.image[0].newFilename : null,
     +fields.price[0],
-    +fields.time[0],
     JSON.parse(fields.lessons[0])
   );
 
@@ -116,9 +120,7 @@ const deleteCourse = async (courseID: number, teacherID: number) => {
   if (course.image) {
     fs.unlink(
       __dirname + "\\..\\..\\public\\images\\" + course.image,
-      (err) => {
-        if (err) throw err;
-      }
+      () => {}
     );
   }
 
@@ -129,6 +131,7 @@ const deleteCourse = async (courseID: number, teacherID: number) => {
 export {
   addCourse,
   getCourses,
+  getCoursesStats,
   getBestCourses,
   getCourseByID,
   enrollCourse,

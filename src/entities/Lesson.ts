@@ -25,7 +25,7 @@ export class Lesson {
   @Column({ type: "text", nullable: true })
   requirement: string;
 
-  @ManyToOne(() => Course, (course) => course.lessons)
+  @ManyToOne(() => Course, (course) => course.lessons, { onDelete: "CASCADE" })
   course: Course;
 
   @OneToMany(() => Document, (document) => document.lesson)

@@ -20,6 +20,15 @@ const getCourses: RequestHandler = async (req, res, next) => {
   }
 };
 
+const getCoursesStats: RequestHandler = async (req, res, next) => {
+  try {
+    const stats = await courseService.getCoursesStats();
+    res.json(stats);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
 const getBestCourses: RequestHandler = async (req, res, next) => {
   try {
     const courses = await courseService.getBestCourses();
@@ -85,6 +94,7 @@ const deleteCourse: RequestHandler = async (req, res, next) => {
 export {
   addCourse,
   getCourses,
+  getCoursesStats,
   getBestCourses,
   getCourseByID,
   enrollCourse,
