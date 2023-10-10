@@ -2,16 +2,9 @@ import { RequestHandler } from "express";
 import * as courseService from "../services/courses";
 
 const addCourse: RequestHandler = async (req, res, next) => {
-  const { name, description, price, time, teacherID } = req.body;
   try {
-    const newCourse = await courseService.addCourse(
-      name,
-      description,
-      price,
-      time,
-      teacherID
-    );
-    if (newCourse) res.send("Created new course");
+    const newCourse = await courseService.addCourse(req);
+    if (newCourse) res.json(newCourse);
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -22,6 +15,15 @@ const getCourses: RequestHandler = async (req, res, next) => {
     const queries = req.query;
     const [courses, coursesCount] = await courseService.getCourses(queries);
     if (courses) res.json([courses, coursesCount]);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+const getCoursesStats: RequestHandler = async (req, res, next) => {
+  try {
+    const stats = await courseService.getCoursesStats();
+    res.json(stats);
   } catch (err) {
     res.status(400).send(err.message);
   }
@@ -69,11 +71,34 @@ const unenrollCourse: RequestHandler = async (req, res, next) => {
   }
 };
 
+const updateCourse: RequestHandler = async (req, res, next) => {
+  try {
+    await courseService.updateCourse(req);
+    res.send("Updated course successfully!");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
+const deleteCourse: RequestHandler = async (req, res, next) => {
+  const courseID = req.params.courseID;
+  const { teacherID } = req.body;
+  try {
+    await courseService.deleteCourse(+courseID, +teacherID);
+    res.send("Deleted course");
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+};
+
 export {
   addCourse,
   getCourses,
+  getCoursesStats,
   getBestCourses,
   getCourseByID,
   enrollCourse,
   unenrollCourse,
+  updateCourse,
+  deleteCourse,
 };

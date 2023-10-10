@@ -4,7 +4,18 @@ import { User } from "../entities/User";
 const userRepo = AppDataSource.getRepository(User);
 
 const findUserByID = (id: number) =>
-  userRepo.findOne({ relations: { courses: true }, where: { id } });
+  userRepo.findOne({
+    relations: { courses: true, teacherProfile: true },
+    where: { id },
+  });
+
+const getProfileByID = (id: number) =>
+  userRepo.findOne({
+    relations: { courses: true, teacherProfile: { courses: true } },
+    where: { id },
+  });
+
+const getUsersCount = () => userRepo.count();
 
 const findUserByUsername = (username: string) =>
   userRepo.findOneBy({ username });
@@ -48,18 +59,23 @@ const updateProfile = async (
   dob: string,
   phone: string,
   address: string,
-  bio: string
+  bio: string,
+  role: string
 ) => {
-  const user = await userRepo.findOneBy({ id });
-  if (!user) throw new Error("Error finding user profile");
-  userRepo.merge(user, {
-    name,
-    email,
-    dob,
-    phone,
-    address,
-    bio,
+  const user = await userRepo.findOne({
+    relations: { teacherProfile: true },
+    where: { id },
   });
+  if (!user) throw new Error("Error finding user profile");
+  if (name) user.name = name;
+  if (email) user.email = email;
+  if (dob) user.dob = dob;
+  if (phone) user.phone = phone;
+  if (address) user.address = address;
+  if (bio) user.bio = bio;
+  if (role && user.teacherProfile) {
+    user.teacherProfile.role = role;
+  }
   return userRepo.save(user);
 };
 
@@ -70,6 +86,8 @@ const changeAvatar = (user: User, imgName: string) => {
 
 export {
   findUserByID,
+  getProfileByID,
+  getUsersCount,
   findUserByUsername,
   findUserByEmail,
   findUserByRefreshToken,

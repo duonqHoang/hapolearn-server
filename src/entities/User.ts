@@ -1,14 +1,16 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
-  Unique,
 } from "typeorm";
 import { Course } from "./Course";
 import { Review } from "./Review";
+import { Teacher } from "./Teacher";
 
 @Entity()
 export class User {
@@ -45,10 +47,17 @@ export class User {
   @Column({ type: "simple-array", nullable: true })
   refreshTokens: string[];
 
-  @ManyToMany(() => Course, (course) => course.learners, { cascade: true })
+  @ManyToMany(() => Course, (course) => course.learners, {
+    cascade: true,
+    onDelete: "CASCADE",
+  })
   @JoinTable()
   courses: Course[];
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
+
+  @OneToOne(() => Teacher, (teacher) => teacher.user, { cascade: true })
+  @JoinColumn()
+  teacherProfile: Teacher;
 }

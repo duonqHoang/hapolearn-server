@@ -19,26 +19,28 @@ const getLessons = async (courseID: number, page: number, s: string) => {
   });
 };
 
+const getLessonsCount = () => lessonRepo.count();
+
 const getOneLesson = async (courseID: number, lessonNumber: number) => {
   const course = await findCourseByID(courseID);
   if (!course) throw new Error("Cannot find course");
-  return lessonRepo.findAndCount({
-    relations: { course: true },
-    skip: lessonNumber - 1,
-    take: 1,
-    where: { course: { id: courseID } },
+  return lessonRepo.findOneBy({
+    id: lessonNumber,
+    course: { id: courseID },
   });
 };
 
 const createLesson = async (
+  courseID: number,
   name: string,
-  description: string,
-  requirement: string,
-  courseID: number
+  time: number,
+  description?: string,
+  requirement?: string
 ) => {
   const course = await findCourseByID(courseID);
   if (!course) throw new Error("Cannot find course");
   const newLesson = lessonRepo.create({
+    time,
     name,
     description,
     requirement,
@@ -48,4 +50,4 @@ const createLesson = async (
   return lessonRepo.save(newLesson);
 };
 
-export { createLesson, getLessons, getOneLesson };
+export { createLesson, getLessons, getLessonsCount, getOneLesson };

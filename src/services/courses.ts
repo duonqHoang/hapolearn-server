@@ -1,21 +1,33 @@
-import { Course } from "entities/Course";
 import * as courseRepo from "../repositories/course";
 import { ParsedQs } from "qs";
+import formidable from "formidable";
+import fs from "fs";
+import { findTeacherByID } from "../repositories/teacher";
+import { Request } from "express";
 
-const addCourse = async (
-  name: string,
-  description: string,
-  price: number,
-  time: number,
-  teacherID: number
-) => {
+const addCourse = async (req: Request) => {
+  const form = formidable({
+    uploadDir: "public/images",
+    keepExtensions: true,
+    maxFiles: 1,
+    multiples: true,
+  });
+
+  const [fields, files] = await form.parse(req);
+
+  fs.rename(files.image[0].filepath, files.image[0].filepath, (err) => {
+    if (err) throw err;
+  });
+
   const newCourse = await courseRepo.addCourse(
-    name,
-    description,
-    price,
-    time,
-    teacherID
+    fields.name[0],
+    fields.description[0],
+    files.image[0].newFilename,
+    +fields.price[0],
+    +req.body.teacherID,
+    JSON.parse(fields.lessons[0])
   );
+
   if (!newCourse) throw new Error("Error creating new course");
   return newCourse;
 };
@@ -25,6 +37,12 @@ const getCourses = async (queries?: ParsedQs) => {
   if (!courses) throw new Error("Error getting courses");
 
   return [courses, coursesCount];
+};
+
+const getCoursesStats = async () => {
+  const stats = await courseRepo.getCoursesStats();
+  if (!stats) throw new Error("Error getting statistics");
+  return stats;
 };
 
 const getBestCourses = async () => {
@@ -51,11 +69,73 @@ const unenrollCourse = async (courseID: number, userID: number) => {
   return savedCourse;
 };
 
+const updateCourse = async (req: Request) => {
+  const courseID = req.params.courseID;
+
+  const course = await courseRepo.findCourseByID(+courseID);
+  if (!course) throw new Error("Course does not exist");
+
+  const form = formidable({
+    uploadDir: "public/images",
+    keepExtensions: true,
+    maxFiles: 1,
+    multiples: true,
+  });
+
+  const [fields, files] = await form.parse(req);
+
+  if (files.image && files.image[0]) {
+    fs.unlink(
+      __dirname + "\\..\\..\\public\\images\\" + course.image,
+      () => {}
+    );
+
+    fs.rename(files.image[0].filepath, files.image[0].filepath, (err) => {
+      if (err) throw err;
+    });
+  }
+
+  const updatedCourse = await courseRepo.updateCourse(
+    course,
+    fields.name[0],
+    fields.description[0],
+    files.image ? files.image[0].newFilename : null,
+    +fields.price[0],
+    JSON.parse(fields.lessons[0])
+  );
+
+  if (!updatedCourse) throw new Error("Error creating new course");
+  return updatedCourse;
+};
+
+const deleteCourse = async (courseID: number, teacherID: number) => {
+  const course = await courseRepo.findCourseByID(courseID);
+  if (!course) throw new Error("Error finding course");
+  const teacher = await findTeacherByID(teacherID);
+  if (!teacher) throw new Error("Error finding teacher");
+  const teacherCourses = await courseRepo.getTeacherCourses(teacherID);
+  if (!teacherCourses.find((course) => course.id === courseID))
+    throw new Error("Course belongs to another teacher");
+
+  if (course.image) {
+    fs.unlink(
+      __dirname + "\\..\\..\\public\\images\\" + course.image,
+      () => {}
+    );
+  }
+
+  const deleted = await courseRepo.deleteCourse(course);
+  return deleted;
+};
+
 export {
   addCourse,
   getCourses,
+  getCoursesStats,
   getBestCourses,
   getCourseByID,
   enrollCourse,
   unenrollCourse,
+  updateCourse,
+  deleteCourse,
 };

@@ -1,11 +1,18 @@
-import { isAuthenticated } from "../middlewares/auth";
+import { isAuthenticated, isTeacher } from "../middlewares/auth";
 import * as courseController from "../controllers/courses";
 import { Router } from "express";
 
 export default (router: Router) => {
-  router.post("/courses", courseController.addCourse);
+  router.post(
+    "/courses",
+    isAuthenticated,
+    isTeacher,
+    courseController.addCourse
+  );
 
   router.get("/courses", courseController.getCourses);
+
+  router.get("/courses-stats", courseController.getCoursesStats);
 
   router.get("/best-courses", courseController.getBestCourses);
 
@@ -21,5 +28,19 @@ export default (router: Router) => {
     "/courses/:courseID/unenroll",
     isAuthenticated,
     courseController.unenrollCourse
+  );
+
+  router.put(
+    "/courses/:courseID",
+    isAuthenticated,
+    isTeacher,
+    courseController.updateCourse
+  );
+
+  router.delete(
+    "/courses/:courseID",
+    isAuthenticated,
+    isTeacher,
+    courseController.deleteCourse
   );
 };
