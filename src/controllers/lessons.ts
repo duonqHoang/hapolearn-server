@@ -4,12 +4,13 @@ import * as lessonServices from "../services/lessons";
 const createLesson: RequestHandler = async (req, res, next) => {
   try {
     const { courseID } = req.params;
-    const { name, description, requirement } = req.body;
+    const { name, time, description, requirement } = req.body;
     const newLesson = await lessonServices.createLesson(
+      +courseID,
       name,
+      +time,
       description,
-      requirement,
-      +courseID
+      requirement
     );
     if (newLesson) {
       res.send("Created new lesson");

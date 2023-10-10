@@ -3,7 +3,7 @@ import formidable from "formidable";
 import fs from "fs";
 
 const getProfile = async (userID: number) => {
-  const user = await userRepo.findUserByID(userID);
+  const user = await userRepo.getProfileByID(userID);
   if (!user) throw new Error("Error getting user profile");
   delete user.password;
   delete user.refreshTokens;
@@ -17,7 +17,8 @@ const updateProfile = async (
   dob: string,
   phone: string,
   address: string,
-  bio: string
+  bio: string,
+  role: string
 ) => {
   const updated = await userRepo.updateProfile(
     id,
@@ -26,7 +27,8 @@ const updateProfile = async (
     dob,
     phone,
     address,
-    bio
+    bio,
+    role
   );
   if (!updated) throw new Error("Error updating user profile");
   return updated;
@@ -50,9 +52,7 @@ const changeAvatar = async (req: any) => {
   });
 
   if (user.avatar) {
-    fs.unlink(__dirname + "\\..\\..\\public\\images\\" + user.avatar, (err) => {
-      if (err) throw err;
-    });
+    fs.unlink(__dirname + "\\..\\..\\public\\images\\" + user.avatar, () => {});
   }
 
   const saved = await userRepo.changeAvatar(user, files.avatar[0].newFilename);

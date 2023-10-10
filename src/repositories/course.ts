@@ -3,20 +3,39 @@ import { AppDataSource } from "../data-source";
 import { findTeacherByID } from "./teacher";
 import { ParsedQs } from "qs";
 import { Lesson } from "../entities/Lesson";
-import { findUserByID } from "./user";
+import { findUserByID, getUsersCount } from "./user";
 import { Review } from "../entities/Review";
+import { getLessonsCount } from "./lesson";
 
 const courseRepo = AppDataSource.getRepository(Course);
 
 const findCourseByID = (id: number) => courseRepo.findOneBy({ id });
 
+const getTeacherCourses = (teacherID: number) =>
+  courseRepo.findBy({ teacher: { id: teacherID } });
+
 const getCourseByID = async (id: number) => {
   const query = courseRepo
     .createQueryBuilder("course")
     .where("course.id = :courseID", { courseID: id })
-    .leftJoin("course.teacher", "teacher");
+    .leftJoin("course.teacher", "teacher")
+    .leftJoin("teacher.user", "user");
 
-  query.addSelect(["course.*", "teacher"]);
+  query.addSelect([
+    "course.*",
+    "teacher",
+    "user.name",
+    "user.avatar",
+    "user.bio",
+  ]);
+
+  query.addSelect((subQuery) => {
+    return subQuery
+      .select("SUM(lesson.time)", "time")
+      .groupBy("lesson.courseId")
+      .from(Lesson, "lesson")
+      .where("lesson.courseId = course.id");
+  }, "course_time");
 
   // get learners and lessons counts
   query.loadRelationCountAndMap("course.lessonsCount", "course.lessons");
@@ -30,8 +49,8 @@ const addCourse = async (
   description: string,
   image: string,
   price: number,
-  time: number,
-  teacherID: number
+  teacherID: number,
+  lessons: Array<{ name: string; time: number }>
 ) => {
   const teacher = await findTeacherByID(teacherID);
   if (!teacher) throw new Error("Cannot find teacher");
@@ -40,8 +59,14 @@ const addCourse = async (
     description,
     image,
     price,
-    time,
     teacher,
+  });
+
+  lessons.forEach((lesson) => {
+    const newLesson = new Lesson();
+    newLesson.name = lesson.name;
+    newLesson.time = lesson.time;
+    newCourse.lessons = [...(newCourse.lessons || []), newLesson];
   });
   return courseRepo.save(newCourse);
 };
@@ -56,6 +81,14 @@ const getCourses = (queries: ParsedQs) => {
   // load lessons and learners counts
   query.loadRelationCountAndMap("course.lessonsCount", "course.lessons");
   query.loadRelationCountAndMap("course.learnersCount", "course.learners");
+
+  query.addSelect((subQuery) => {
+    return subQuery
+      .select("SUM(lesson.time)", "time")
+      .groupBy("lesson.courseId")
+      .from(Lesson, "lesson")
+      .where("lesson.courseId = course.id");
+  }, "course_time");
 
   // filters
   if (s) {
@@ -94,7 +127,7 @@ const getCourses = (queries: ParsedQs) => {
   }
 
   if (time) {
-    query.addOrderBy("course.time", time === "asc" ? "ASC" : "DESC");
+    query.addOrderBy("course_time", time === "asc" ? "ASC" : "DESC");
   }
 
   if (review) {
@@ -114,6 +147,13 @@ const getCourses = (queries: ParsedQs) => {
   return query.getManyAndCount();
 };
 
+const getCoursesStats = async () => {
+  const coursesCount = await courseRepo.count();
+  const learnersCount = await getUsersCount();
+  const lessonsCount = await getLessonsCount();
+  return { coursesCount, lessonsCount, learnersCount };
+};
+
 const getBestCourses = async () => {
   const query = courseRepo.createQueryBuilder("course");
   query.addSelect((sb) => {
@@ -130,13 +170,14 @@ const getBestCourses = async () => {
 
 const enrollCourse = async (courseID: number, userID: number) => {
   const course = await courseRepo.findOne({
-    relations: { learners: true },
+    relations: { learners: true, teacher: true },
     where: { id: courseID },
   });
   if (!course) throw new Error("Error finding course");
   const user = await findUserByID(userID);
   if (!user) throw new Error("Error finding user");
-
+  if (course.teacher.id === user?.teacherProfile?.id)
+    throw new Error("Cannot enroll in your own course");
   if (
     course.learners.find((learner) => {
       return learner.id === user.id;
@@ -163,12 +204,43 @@ const unenrollCourse = async (courseID: number, userID: number) => {
   return courseRepo.save(course);
 };
 
+const updateCourse = (
+  course: Course,
+  name: string,
+  description: string,
+  image: string,
+  price: number,
+  lessons: Array<{ name: string; time: number }>
+) => {
+  if (name) course.name = name;
+  if (description) course.description = description;
+  if (image) course.image = image;
+  if (price) course.price = price;
+  if (lessons?.length > 0) {
+    course.lessons = lessons.map((item) => {
+      const lesson = new Lesson();
+      lesson.name = item.name;
+      lesson.time = item.time;
+      return lesson;
+    });
+  }
+  return courseRepo.save(course);
+};
+
+const deleteCourse = (course: Course) => {
+  return courseRepo.delete({ id: course.id });
+};
+
 export {
   findCourseByID,
+  getTeacherCourses,
   getCourseByID,
   addCourse,
   getCourses,
+  getCoursesStats,
   getBestCourses,
   enrollCourse,
   unenrollCourse,
+  updateCourse,
+  deleteCourse,
 };

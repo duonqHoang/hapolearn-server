@@ -11,6 +11,7 @@ class ProfileForm {
   @IsOptional()
   name: string;
 
+  @IsOptional()
   @IsEmail()
   email: string;
 
@@ -28,6 +29,9 @@ class ProfileForm {
 
   @IsOptional()
   bio: string;
+
+  @IsOptional()
+  role: string;
 }
 
 export const validateUpdateProfile = (
@@ -36,10 +40,11 @@ export const validateUpdateProfile = (
   dob: string,
   phone: string,
   address: string,
-  bio: string
+  bio: string,
+  role: string
 ) => {
   const input = new ProfileForm();
-  Object.assign(input, { name, email, dob, phone, address, bio });
+  Object.assign(input, { name, email, dob, phone, address, bio, role });
 
   return validate(input, { validationError: { target: false } });
 };

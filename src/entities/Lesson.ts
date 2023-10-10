@@ -16,13 +16,16 @@ export class Lesson {
   @Column()
   name: string;
 
-  @Column({ type: "text" })
+  @Column()
+  time: number;
+
+  @Column({ type: "text", nullable: true })
   description: string;
 
-  @Column({ type: "text" })
+  @Column({ type: "text", nullable: true })
   requirement: string;
 
-  @ManyToOne(() => Course, (course) => course.lessons)
+  @ManyToOne(() => Course, (course) => course.lessons, { onDelete: "CASCADE" })
   course: Course;
 
   @OneToMany(() => Document, (document) => document.lesson)

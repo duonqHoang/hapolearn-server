@@ -1,16 +1,18 @@
 import * as lessonRepo from "../repositories/lesson";
 
 const createLesson = async (
+  courseID: number,
   name: string,
-  description: string,
-  requirement: string,
-  courseID: number
+  time: number,
+  description?: string,
+  requirement?: string
 ) => {
   const newLesson = await lessonRepo.createLesson(
+    courseID,
     name,
+    time,
     description,
-    requirement,
-    courseID
+    requirement
   );
   if (!newLesson) throw new Error("Error creating new lesson");
   return newLesson;

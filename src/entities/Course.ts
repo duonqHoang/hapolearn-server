@@ -30,19 +30,16 @@ export class Course {
   @Column({ nullable: true })
   image: string;
 
-  @Column()
-  time: number;
-
-  @ManyToMany(() => User, (user) => user.courses)
+  @ManyToMany(() => User, (user) => user.courses, { onDelete: "CASCADE" })
   learners: User[];
 
-  @OneToMany(() => Review, (review) => review.course, { cascade: true })
+  @OneToMany(() => Review, (review) => review.course)
   reviews: Review[];
 
   @OneToMany(() => Lesson, (lesson) => lesson.course, { cascade: true })
   lessons: Lesson[];
 
-  @ManyToOne(() => Teacher, (teacher) => teacher.courses, { cascade: true })
+  @ManyToOne(() => Teacher, (teacher) => teacher.courses)
   teacher: Teacher;
 
   @CreateDateColumn()
@@ -54,5 +51,6 @@ export class Course {
   @Column({ type: "simple-array", nullable: true })
   tags: string[];
 
-  averageRating?: number;
+  @Column({ select: false, nullable: true })
+  time: number;
 }
