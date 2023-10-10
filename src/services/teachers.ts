@@ -1,5 +1,4 @@
 import * as teacherRepo from "../repositories/teacher";
-import { register } from "./auth";
 
 const addTeacher = async (userID: number, role: string) => {
   const newTeacher = await teacherRepo.addTeacher(userID, role);

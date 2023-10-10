@@ -51,6 +51,6 @@ export class Course {
   @Column({ type: "simple-array", nullable: true })
   tags: string[];
 
-  @Column({ select: false })
+  @Column({ select: false, nullable: true })
   time: number;
 }

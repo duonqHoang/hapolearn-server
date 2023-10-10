@@ -170,13 +170,14 @@ const getBestCourses = async () => {
 
 const enrollCourse = async (courseID: number, userID: number) => {
   const course = await courseRepo.findOne({
-    relations: { learners: true },
+    relations: { learners: true, teacher: true },
     where: { id: courseID },
   });
   if (!course) throw new Error("Error finding course");
   const user = await findUserByID(userID);
   if (!user) throw new Error("Error finding user");
-
+  if (course.teacher.id === user?.teacherProfile?.id)
+    throw new Error("Cannot enroll in your own course");
   if (
     course.learners.find((learner) => {
       return learner.id === user.id;
